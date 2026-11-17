@@ -87,6 +87,7 @@ migrate-firestore: emulator-up
 # Cloud Build でイメージビルド & プッシュ
 cloud-build: _require-project
     gcloud builds submit \
+        --project={{ project_id }} \
         --config {{ infra_dir }}/cloudbuild.yaml \
         --substitutions=_IMAGE={{ image }} \
         {{ repo_root }}

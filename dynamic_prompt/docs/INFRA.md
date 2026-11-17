@@ -64,6 +64,29 @@ Windows: `justfile` sets `windows-shell` to Git Bash (`C:/Program Files/Git/usr/
 - Single instance only (SQLite single-writer constraint); persistence via a GCS bucket mounted at `/data`
 - Health check: `GET /health`
 
+## First deployment to a new project
+
+`just deploy` only works once the project already has the Artifact Registry repo and the prompts in GCS. On a brand-new project, follow this order (verified 2026-11):
+
+1. Create the project and link billing (`gcloud projects create <id>` / `gcloud billing projects link <id> --billing-account=<account>`). Terraform authenticates with ADC: `gcloud auth application-default login`.
+2. Compute `service_url` up front — Cloud Run's deterministic URL is `https://dynamic-prompt-<PROJECT_NUMBER>.<region>.run.app` (`gcloud projects describe <id> --format='value(projectNumber)'`). No placeholder apply is needed. The `service_url` Terraform output shows the legacy `*.a.run.app` URL instead; both serve the same service.
+3. In the Console (Google Auth Platform): consent screen (External, Testing; add yourself as a test user), then a "Web application" OAuth client with redirect URI `{service_url}/auth/callback`. The client secret is shown in full only once.
+4. Write `terraform/terraform.tfvars` (from `terraform.tfvars.example`), then `just tf-init`.
+5. Create the APIs and the registry first, because `cloud-build` pushes into a repo Terraform creates:
+   `terraform -chdir=terraform apply -target=google_project_service.apis -target=google_artifact_registry_repository.repo`
+6. `just cloud-build`. Right after project creation it may fail with `PERMISSION_DENIED ... serviceusage.services.use` even for the owner — IAM propagation; retry after a minute.
+7. Create the bucket and upload the prompts **before** Cloud Run starts — the server reads `prompts/user_config.yaml` from GCS at startup and exits(1) if it is missing:
+   `terraform -chdir=terraform apply -target=google_storage_bucket.data` → `just upload-prompts`
+8. `just tf-apply`, then `just cloud-health` / `just cloud-info`.
+
+If the Cloud Run service is created but its first revision fails, Terraform marks it tainted and cannot replace it: google provider v6 keeps `deletion_protection = true` on `google_cloud_run_v2_service` by default. Untainting does not help either (no template diff → no new revision). Delete the empty service with `gcloud run services delete dynamic-prompt`, `terraform state rm google_cloud_run_v2_service.app`, and apply again. For the same reason `just tf-destroy` fails on the service unless `deletion_protection = false` is applied first.
+
+## Known behavior
+
+- `terraform plan` always shows an in-place change on the service-level `scaling` block (`min_instance_count = 0 -> null`). It is a provider quirk and harmless.
+- The Dockerfile runs `uv sync` per package without a lock file (the umbrella `uv.lock` is outside the build context), so dependency versions can differ from the local environment.
+- `uv run` in `CMD` syncs the dev dependency group at container start (a few extra packages), which slows cold starts slightly.
+
 ## Auth
 
 FastMCP `GoogleProvider` (OAuth 2.1), protecting only `/mcp` (`/health` and the quiz UI are open). Cloud Run IAM grants `allUsers` → `roles/run.invoker` (auth is app-level, not IAM-level). Configured via `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET`/`SERVICE_URL`/`ALLOWED_EMAILS` env vars on the container. `allowed_emails` (terraform var) restricts to specific Google accounts; unset = allow all. Requires a pre-created OAuth consent screen + credentials in GCP Console, with redirect URI `{SERVICE_URL}/auth/callback`.

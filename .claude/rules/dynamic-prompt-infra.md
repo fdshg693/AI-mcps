@@ -9,3 +9,5 @@ Cloud Run へのデプロイ基盤。コマンドは `dynamic_prompt/infra/justf
 
 - Dockerfile のビルドコンテキストはこのサブモジュールのルート (`mcps/`)。アンブレラのルートにしない (全サブモジュールがコンテキストに入る)。
 - `terraform.tfvars` / `terraform.tfstate*` は必ず gitignore 対象。GCS バケットは `prevent_destroy`。
+- 新しいプロジェクトへの初回デプロイは `just deploy` 一発では通らない (Artifact Registry と GCS の prompts が先に要る)。順序は [docs/INFRA.md の「First deployment to a new project」](../../dynamic_prompt/docs/INFRA.md#first-deployment-to-a-new-project)。
+- GCP を呼ぶレシピは `--project={{ project_id }}` を明示する (gcloud の既定プロジェクトに向かないように)。
