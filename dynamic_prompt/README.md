@@ -26,12 +26,14 @@ AI に外国語学習を伴走させるための MCP サーバー。AI 単体で
 
 ## 導入
 
+コマンドはアンブレラ（fdshg693/AI）のルートで実行する（パッケージはアンブレラの uv workspace のメンバー）。
+
 ### 1. ローカル実行 (stdio)
 
 Claude Desktop など stdio で接続するクライアント向け。
 
 ```bash
-uv run dynamic_prompt
+uv run --package dynamic_prompt dynamic_prompt
 ```
 
 - MCP サーバーと一緒にクイズ Web サーバー (`http://127.0.0.1:8765` 付近) が自動起動する。ポートは `8765–8767` のプールから空いているものを使う ([app_config.yaml](src/dynamic_prompt/prompts/app_config.yaml) で変更可)。
@@ -40,13 +42,13 @@ uv run dynamic_prompt
 
 ### 2. リモート実行 (HTTP + OAuth)
 
-Claude Web (claude.ai) など HTTP で接続するクライアント向け。Cloud Run へのデプロイ手順は [infra/CLAUDE.md](infra/CLAUDE.md) を参照。
+Claude Web (claude.ai) など HTTP で接続するクライアント向け。Cloud Run へのデプロイ手順は [docs/INFRA.md](docs/INFRA.md) を参照。
 
 ```bash
 TRANSPORT=http PORT=8080 \
 GOOGLE_CLIENT_ID=...  GOOGLE_CLIENT_SECRET=... \
 SERVICE_URL=https://<your-host> \
-uv run dynamic_prompt
+uv run --package dynamic_prompt dynamic_prompt
 ```
 
 | 環境変数                                    | 用途                                                                                      |
@@ -110,5 +112,5 @@ YAML を編集するだけで挙動を変えられる。
 YAML を編集したら整合性チェックを走らせる。
 
 ```bash
-uv run mcps/dynamic_prompt/src/dynamic_prompt/validate.py
+uv run --package dynamic_prompt python mcps/dynamic_prompt/src/dynamic_prompt/validate.py
 ```

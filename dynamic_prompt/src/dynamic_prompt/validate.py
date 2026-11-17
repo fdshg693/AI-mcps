@@ -3,7 +3,7 @@ instructions.yaml の variables 宣言と、user_config.yaml / languages/*.yaml 
 キーの整合性をチェックするバリデーションスクリプト。
 
 Usage:
-    uv run mcps/dynamic_prompt/src/dynamic_prompt/validate.py
+    uv run --package dynamic_prompt python mcps/dynamic_prompt/src/dynamic_prompt/validate.py
 """
 
 import re

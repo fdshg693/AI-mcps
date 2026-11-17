@@ -1,13 +1,13 @@
 # dynamic_prompt Infra
 
-Covers `mcps/dynamic_prompt/infra/` — Docker / Cloud Build / Terraform for GCP Cloud Run deployment.
+Covers `dynamic_prompt/infra/` (paths are relative to the `mcps` submodule root) — Docker / Cloud Build / Terraform for GCP Cloud Run deployment.
 
 ## Commands (`justfile`)
 
-All commands run from `mcps/dynamic_prompt/infra/` via [just](https://github.com/casey/just).
+All commands run from `dynamic_prompt/infra/` via [just](https://github.com/casey/just).
 
 ```bash
-cd mcps/dynamic_prompt/infra
+cd dynamic_prompt/infra
 
 just                # list recipes (default)
 
@@ -27,16 +27,18 @@ just cloud-info / cloud-health         # gcloud service info / unauthenticated h
 just deploy                            # cloud-build -> tf-apply
 ```
 
+GCP project ID: recipes that call GCP read `GCP_PROJECT_ID`, else `project_id` in `terraform/terraform.tfvars`, and stop if neither is set. No project ID is hard-coded.
+
 Windows: `justfile` sets `windows-shell` to Git Bash (`C:/Program Files/Git/usr/bin/bash.exe`) to avoid mojibake.
 
 ## Layout
 
-| Path                             | Content                                                                                                            |
-| -------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `Dockerfile`                     | Python 3.13-slim + uv. Build context is the **repo root** (`my_ai_tools/`) — pass `-f` to point at this Dockerfile |
-| `firestore-emulator.compose.yml` | Official Cloud SDK emulator image (bundles Java, no host JDK needed). Port 8085 with healthcheck                   |
-| `cloudbuild.yaml`                | Cloud Build definition; `_IMAGE` substitution var sets the registry path                                           |
-| `terraform/`                     | Cloud Run, Artifact Registry, GCS, IAM                                                                             |
+| Path                             | Content                                                                                                                               |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `Dockerfile`                     | Python 3.13-slim + uv. Build context is the **`mcps` submodule root** (not the umbrella root) — pass `-f` to point at this Dockerfile |
+| `firestore-emulator.compose.yml` | Official Cloud SDK emulator image (bundles Java, no host JDK needed). Port 8085 with healthcheck                                      |
+| `cloudbuild.yaml`                | Cloud Build definition; `_IMAGE` substitution var sets the registry path                                                              |
+| `terraform/`                     | Cloud Run, Artifact Registry, GCS, IAM                                                                                                |
 
 **Dockerfile**: separates dependency install from code copy for cache efficiency. Default env: `TRANSPORT=http`, `HOST=0.0.0.0`, `PORT=8080`, `DB_PATH=/data/vocab.db`. Cloud Run YAML source: `PROMPTS_URI=gs://${project_id}-dp-data/prompts`, `CONFIG_TTL_SECONDS=60` — sync YAML via `just upload-prompts`, apply immediately by calling the `reload_config` MCP tool.
 
@@ -55,9 +57,10 @@ Windows: `justfile` sets `windows-shell` to Git Bash (`C:/Program Files/Git/usr/
 
 ## GCP environment
 
-- Project: `dynamic-prompt-mcp` / Region: `asia-northeast1`
-- Cloud Run URL: `https://dynamic-prompt-m2py3twbha-an.a.run.app` (MCP endpoint: `/mcp`)
-- Artifact Registry: `asia-northeast1-docker.pkg.dev/dynamic-prompt-mcp/dynamic-prompt/server`
+- Project: `project_id` in `terraform.tfvars` / Region: `asia-northeast1` (`region` variable default)
+- Cloud Run URL: `just tf-output` → `service_url` (MCP endpoint: `/mcp`)
+- Artifact Registry: `asia-northeast1-docker.pkg.dev/<project_id>/dynamic-prompt/server`
+- Upload filters: `.dockerignore` (local `docker build`) and `.gcloudignore` (`gcloud builds submit`) at the submodule root keep `.env`, `*.db`, tfstate/tfvars and the umbrella Junctions out of the build
 - Single instance only (SQLite single-writer constraint); persistence via a GCS bucket mounted at `/data`
 - Health check: `GET /health`
 

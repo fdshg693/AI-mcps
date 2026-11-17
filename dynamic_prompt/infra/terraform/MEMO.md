@@ -4,9 +4,9 @@ Cloud Run + FastMCP GoogleProvider で OAuth 2.1 認証を導入する際の躓�
 
 ## 1. Cloud Build のビルドコンテキスト
 
-- `REPO_ROOT` が Git リポジトリルートを指す場合、Dockerfile の `COPY mcps/...` パスと合わない
+- `REPO_ROOT` が Git リポジトリルートを指す場合、Dockerfile の `COPY dynamic_prompt/...` パスと合わない（現在のコンテキストは mcps サブモジュールのルート）
 - **確認**: `cloudbuild.yaml` の `-f` パスと Dockerfile 内の `COPY` パスが、ビルドコンテキストからの相対パスとして整合しているか
-- **対処**: Makefile の `REPO_ROOT` を Dockerfile が期待するルートに合わせる
+- **対処**: justfile の `repo_root` を Dockerfile が期待するルートに合わせる
 
 ## 2. Cloud Run の OAuth ストレージ永続化
 

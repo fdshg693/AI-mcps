@@ -26,3 +26,32 @@ __pycache__/
 *terraform.tfvars
 *.tfstate*
 .terraform/
+# --- Tool-wide ignores shared with the other submodules (kept in sync by hand with the
+# umbrella's .gitignore, fdshg693/AI; the umbrella's rules do not apply inside a submodule) ---
+.env
+*.pem
+*.py[cod]
+node_modules/
+logs/
+# skill-tools feedback (`--fb`)
+fb/
+
+# caches and local databases
+.cache/
+*.sqlite3
+.codegraph/
+.textgraph/
+
+# Claude Code: hooks installed by `just sub-agent-hooks-install` and local settings (generated)
+.claude/settings.json
+.claude/settings.local.json
+.claude/hooks/
+.claude/tasks/
+# local hook selection (the committed sample is .claude/skill-tools.hooks.example.yaml)
+.claude/skill-tools.hooks.yaml
+.skill-tools/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini

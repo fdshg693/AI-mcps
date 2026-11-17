@@ -1,0 +1,23 @@
+# Build context is this submodule's root (mcps/). Keep local data and secrets out of the image.
+**/__pycache__
+**/.pytest_cache
+**/.ruff_cache
+*.pyc
+.git
+.venv
+**/.venv
+# local data / secrets (gitignored; never bake into the image)
+*.env
+**/.env
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+**/terraform/.terraform
+**/*.tfstate*
+**/terraform.tfvars
+# not needed at runtime
+.claude
+# Junctions created by `just links-sync` (point outside this repository)
+plans
+_umbrella
