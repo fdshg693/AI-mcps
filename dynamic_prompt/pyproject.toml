@@ -2,7 +2,7 @@
 name = "dynamic_prompt"
 version = "0.1.0"
 description = "言語学習サポート用MCPサーバー"
-requires-python = ">=3.13"
+requires-python = ">=3.11"
 dependencies = [
     "fastmcp[apps]>=3.1.0",
     "prefab-ui>=0.13.1",
