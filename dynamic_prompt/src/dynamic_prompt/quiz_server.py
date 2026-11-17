@@ -266,9 +266,7 @@ def start_quiz_server(port: int = 8765, pool_size: int = 3) -> int:
 
         # 2) アクティブにリッスンしている → 古いプロセスをkill
         if _is_port_listening(candidate):
-            logger.info(
-                "Port %d has an active listener, killing old process...", candidate
-            )
+            logger.info("Port %d has an active listener, killing old process...", candidate)
             _kill_process_on_port(candidate)
             # kill 後にポートが解放されるまで最大2秒リトライ
             for _ in range(4):
@@ -292,9 +290,7 @@ def start_quiz_server(port: int = 8765, pool_size: int = 3) -> int:
         logger.warning("Port %d still unavailable, trying next...", candidate)
 
     if selected_port is None:
-        raise RuntimeError(
-            f"All ports in pool {port}\u2013{port + pool_size - 1} are unavailable"
-        )
+        raise RuntimeError(f"All ports in pool {port}\u2013{port + pool_size - 1} are unavailable")
 
     ready_event = threading.Event()
     final_port = selected_port  # closure 用
@@ -350,9 +346,7 @@ def _cleanup_loop(loop: asyncio.AbstractEventLoop) -> None:
         for task in pending:
             task.cancel()
         if pending:
-            loop.run_until_complete(
-                asyncio.gather(*pending, return_exceptions=True)
-            )
+            loop.run_until_complete(asyncio.gather(*pending, return_exceptions=True))
         loop.run_until_complete(loop.shutdown_asyncgens())
     except Exception:
         pass  # シャットダウン中のエラーは無視

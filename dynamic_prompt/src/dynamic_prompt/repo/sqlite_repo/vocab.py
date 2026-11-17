@@ -39,9 +39,7 @@ def _process_answer(db: sqlite3.Connection, lang: str, word: str, is_correct: bo
 
     if is_correct:
         if status == STATUS_UNLEARNED:
-            db.execute(
-                "DELETE FROM unknown_words WHERE lang = ? AND word = ?", (lang, w)
-            )
+            db.execute("DELETE FROM unknown_words WHERE lang = ? AND word = ?", (lang, w))
             return f"'{word.strip()}': correct, removed"
         if status == STATUS_WRONG:
             db.execute(
@@ -110,10 +108,7 @@ def get_review_pool_db(lang: str, limit: int, memory_test_period_hours: int) -> 
                 limit,
             ),
         ).fetchall()
-    return [
-        {"word": r["word"], "context": r["context"], "status": r["status"]}
-        for r in rows
-    ]
+    return [{"word": r["word"], "context": r["context"], "status": r["status"]} for r in rows]
 
 
 def process_answers_db(lang: str, correct: list[str], incorrect: list[str]) -> list[str]:
@@ -136,12 +131,8 @@ class SqliteVocabRepo:
     def save_words(self, lang: str, words: list[str], context: str = "") -> list[str]:
         return save_words_db(lang, words, context)
 
-    def get_review_pool(
-        self, lang: str, limit: int, memory_test_period_hours: int
-    ) -> list[dict]:
+    def get_review_pool(self, lang: str, limit: int, memory_test_period_hours: int) -> list[dict]:
         return get_review_pool_db(lang, limit, memory_test_period_hours)
 
-    def process_answers(
-        self, lang: str, correct: list[str], incorrect: list[str]
-    ) -> list[str]:
+    def process_answers(self, lang: str, correct: list[str], incorrect: list[str]) -> list[str]:
         return process_answers_db(lang, correct, incorrect)

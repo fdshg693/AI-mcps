@@ -23,6 +23,7 @@ Phase 6 でローカル動作確認した Next.js 管理WebをCloud Runに別サ
 ### 7.1 Dockerfile
 
 `mcps/dynamic_prompt/admin-web/Dockerfile`:
+
 ```dockerfile
 # syntax=docker/dockerfile:1
 FROM node:22-alpine AS deps
@@ -55,6 +56,7 @@ CMD ["node", "server.js"]
 ```
 
 `admin-web/next.config.ts` に `output: "standalone"` を設定:
+
 ```ts
 const config: NextConfig = {
   output: "standalone",
@@ -66,6 +68,7 @@ export default config;
 ### 7.2 Cloud Build設定
 
 `infra/cloudbuild-admin-web.yaml`:
+
 ```yaml
 steps:
   - name: gcr.io/cloud-builders/docker
@@ -77,7 +80,7 @@ steps:
       - ${_IMAGE}
       - .
   - name: gcr.io/cloud-builders/docker
-    args: [push, '${_IMAGE}']
+    args: [push, "${_IMAGE}"]
 images:
   - ${_IMAGE}
 substitutions:
@@ -89,6 +92,7 @@ options:
 ### 7.3 Terraform: 管理Web Cloud Run
 
 `infra/terraform/cloud_run_admin.tf`:
+
 ```hcl
 resource "google_service_account" "admin" {
   account_id   = "dynamic-prompt-admin"
@@ -128,6 +132,7 @@ resource "google_cloud_run_v2_service" "admin" {
 ```
 
 `infra/terraform/iam_admin.tf`:
+
 ```hcl
 resource "google_cloud_run_v2_service_iam_member" "admin_public" {
   project  = var.project_id
@@ -151,6 +156,7 @@ resource "google_storage_bucket_iam_member" "admin_prompts_bucket" {
 ```
 
 `infra/terraform/variables.tf` に追加:
+
 ```hcl
 variable "admin_image" {
   type    = string
@@ -176,6 +182,7 @@ variable "admin_service_url" {
 ```
 
 `infra/terraform/outputs.tf` に追加:
+
 ```hcl
 output "admin_service_url" {
   value = google_cloud_run_v2_service.admin.uri
@@ -187,6 +194,7 @@ output "admin_service_url" {
 ### 7.4 justfile レシピ追加
 
 `infra/justfile` 末尾に追記:
+
 ```just
 # Admin Web image variables
 admin_image := "asia-northeast1-docker.pkg.dev/dynamic-prompt-mcp/dynamic-prompt/admin:latest"
@@ -244,6 +252,7 @@ just tf-apply
 ### 7.6 OAuth redirect URI 追加
 
 GCPコンソール > APIs & Services > Credentials > 管理用OAuthクライアント編集:
+
 - Authorized redirect URIs に追加: `https://<admin-service-url>/api/auth/callback/google`
 
 ### 7.7 本番スモークテスト
@@ -254,6 +263,7 @@ Start-Process $ADMIN_URL
 ```
 
 ブラウザで:
+
 1. `/login` → "Sign in with Google" → 許可リスト内アカウントで認証
 2. `/dashboard` カード表示
 3. `/configs/user_config.yaml` 編集 → 保存 → 200確認

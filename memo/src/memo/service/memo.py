@@ -68,9 +68,7 @@ def _require_known_category(user_id: int, category: str | None) -> None:
         raise UnknownCategory(normalized)
 
 
-def create_memo(
-    user_id: int, title: str, summary: str = "", category: str | None = None
-) -> dict:
+def create_memo(user_id: int, title: str, summary: str = "", category: str | None = None) -> dict:
     """メモを新規作成して作成レコードを返す。所有者は ``user_id``。
 
     ``title`` 必須 (trim 後に空なら ``TitleRequired``)。``summary`` は trim する。
@@ -191,9 +189,7 @@ def semantic_search(
         if not memo["summary"].strip():
             continue
         scored_memo = dict(memo)
-        scored_memo["similarity"] = round(
-            _cosine(query_vec, _embedding_for_memo(memo)), 6
-        )
+        scored_memo["similarity"] = round(_cosine(query_vec, _embedding_for_memo(memo)), 6)
         scored.append(scored_memo)
 
     scored.sort(key=lambda m: m["similarity"], reverse=True)

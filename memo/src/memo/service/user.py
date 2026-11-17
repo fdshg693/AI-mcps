@@ -84,9 +84,7 @@ def get_user(name: str) -> dict:
     return user
 
 
-def create_user(
-    name: str, display_name: str = "", note: str = "", is_admin: bool = False
-) -> dict:
+def create_user(name: str, display_name: str = "", note: str = "", is_admin: bool = False) -> dict:
     """ユーザーを新規登録して作成レコードを返す。
 
     ``name`` 必須 (空なら ``NameRequired``)。``name`` / ``display_name`` /

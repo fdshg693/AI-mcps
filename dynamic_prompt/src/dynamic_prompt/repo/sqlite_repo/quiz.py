@@ -256,9 +256,7 @@ def get_unscored_sessions_db(lang: str, limit: int = 5) -> list[dict]:
                             "model_answer": q["model_answer"] or "",
                             "user_answer_text": q["user_answer_text"] or "",
                             "is_correct": (
-                                bool(q["is_correct"])
-                                if q["is_correct"] is not None
-                                else None
+                                bool(q["is_correct"]) if q["is_correct"] is not None else None
                             ),
                         }
                         for q in questions

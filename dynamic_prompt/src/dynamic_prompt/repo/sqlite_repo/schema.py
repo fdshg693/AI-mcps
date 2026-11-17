@@ -32,13 +32,9 @@ def _table_exists(db: sqlite3.Connection, table: str) -> bool:
 def _migration_001(db: sqlite3.Connection) -> None:
     """既存 DB に status / reviewed_at カラムがなければ追加する。"""
     if not _column_exists(db, "unknown_words", "status"):
-        db.execute(
-            "ALTER TABLE unknown_words ADD COLUMN status TEXT NOT NULL DEFAULT 'unlearned'"
-        )
+        db.execute("ALTER TABLE unknown_words ADD COLUMN status TEXT NOT NULL DEFAULT 'unlearned'")
     if not _column_exists(db, "unknown_words", "reviewed_at"):
-        db.execute(
-            "ALTER TABLE unknown_words ADD COLUMN reviewed_at TEXT DEFAULT NULL"
-        )
+        db.execute("ALTER TABLE unknown_words ADD COLUMN reviewed_at TEXT DEFAULT NULL")
 
 
 def _migration_002(db: sqlite3.Connection) -> None:
@@ -64,18 +60,12 @@ def _migration_003(db: sqlite3.Connection) -> None:
                 "ALTER TABLE quiz_questions ADD COLUMN question_type TEXT NOT NULL DEFAULT 'mc'"
             )
         if not _column_exists(db, "quiz_questions", "model_answer"):
-            db.execute(
-                "ALTER TABLE quiz_questions ADD COLUMN model_answer TEXT DEFAULT NULL"
-            )
+            db.execute("ALTER TABLE quiz_questions ADD COLUMN model_answer TEXT DEFAULT NULL")
         if not _column_exists(db, "quiz_questions", "user_answer_text"):
-            db.execute(
-                "ALTER TABLE quiz_questions ADD COLUMN user_answer_text TEXT DEFAULT NULL"
-            )
+            db.execute("ALTER TABLE quiz_questions ADD COLUMN user_answer_text TEXT DEFAULT NULL")
     if _table_exists(db, "quiz_sessions"):
         if not _column_exists(db, "quiz_sessions", "scored_at"):
-            db.execute(
-                "ALTER TABLE quiz_sessions ADD COLUMN scored_at TEXT DEFAULT NULL"
-            )
+            db.execute("ALTER TABLE quiz_sessions ADD COLUMN scored_at TEXT DEFAULT NULL")
 
 
 _MIGRATIONS: list[tuple[int, str, Callable[[sqlite3.Connection], None]]] = [

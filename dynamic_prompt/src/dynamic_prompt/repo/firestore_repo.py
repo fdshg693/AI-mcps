@@ -131,9 +131,7 @@ class FirestoreVocabRepo:
             saved.append(w)
         return saved
 
-    def get_review_pool(
-        self, lang: str, limit: int, memory_test_period_hours: int
-    ) -> list[dict]:
+    def get_review_pool(self, lang: str, limit: int, memory_test_period_hours: int) -> list[dict]:
         """復習対象の単語をランダムに返す。
 
         ``unlearned`` / ``wrong`` は常に対象。``memory_test`` は ``reviewed_at`` から
@@ -156,16 +154,12 @@ class FirestoreVocabRepo:
                     continue
             else:
                 continue
-            pool.append(
-                {"word": d.get("word"), "context": d.get("context"), "status": status}
-            )
+            pool.append({"word": d.get("word"), "context": d.get("context"), "status": status})
         if len(pool) > limit:
             pool = random.sample(pool, limit)
         return pool
 
-    def process_answers(
-        self, lang: str, correct: list[str], incorrect: list[str]
-    ) -> list[str]:
+    def process_answers(self, lang: str, correct: list[str], incorrect: list[str]) -> list[str]:
         """正答・誤答にステータス遷移を適用し、結果メッセージのリストを返す。"""
         results: list[str] = []
         for w in correct:
@@ -227,10 +221,7 @@ class FirestoreQuizRepo:
     def _questions(self, session_id: int) -> list[dict]:
         """セッションの問題を question_index 昇順で返す (生ドキュメント dict)。"""
         snaps = (
-            self._session_ref(session_id)
-            .collection(_QUESTIONS)
-            .order_by("question_index")
-            .stream()
+            self._session_ref(session_id).collection(_QUESTIONS).order_by("question_index").stream()
         )
         return [s.to_dict() for s in snaps]
 
@@ -367,9 +358,7 @@ class FirestoreQuizRepo:
         for q in self._questions(sid):
             qtype = q.get("question_type") or "mc"
             if qtype == "free":
-                result_questions.append(
-                    {"question": q["question_text"], "question_type": "free"}
-                )
+                result_questions.append({"question": q["question_text"], "question_type": "free"})
             else:
                 result_questions.append(
                     {
@@ -392,9 +381,7 @@ class FirestoreQuizRepo:
             filter=firestore.FieldFilter("lang", "==", lang)
         )
         sessions = [
-            d
-            for d in (s.to_dict() for s in query.stream())
-            if d.get("submitted_at") is not None
+            d for d in (s.to_dict() for s in query.stream()) if d.get("submitted_at") is not None
         ]
         sessions.sort(key=lambda d: d["submitted_at"], reverse=True)
         sessions = sessions[:limit]
@@ -415,9 +402,7 @@ class FirestoreQuizRepo:
                             "question_type": "free",
                             "model_answer": q.get("model_answer") or "",
                             "user_answer_text": q.get("user_answer_text") or "",
-                            "is_correct": bool(is_correct)
-                            if is_correct is not None
-                            else None,
+                            "is_correct": bool(is_correct) if is_correct is not None else None,
                         }
                     )
                 else:
@@ -430,9 +415,7 @@ class FirestoreQuizRepo:
                             "question_type": "mc",
                             "correct_choice": choices[q["correct_index"]],
                             "user_choice": (
-                                choices[user_answer]
-                                if user_answer is not None
-                                else "(未回答)"
+                                choices[user_answer] if user_answer is not None else "(未回答)"
                             ),
                             "is_correct": bool(is_correct),
                         }

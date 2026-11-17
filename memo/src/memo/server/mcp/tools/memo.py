@@ -130,9 +130,7 @@ def search_memos(query: str, limit: int = 50, category: str = "") -> str:
             keywords.append(kw)
     if not keywords:
         return "Error: query is required."
-    memos = search_memos_service(
-        user_id, keywords, limit, category=category.strip() or None
-    )
+    memos = search_memos_service(user_id, keywords, limit, category=category.strip() or None)
     if not memos:
         return f"No memos matched any of: {', '.join(keywords)}."
     return _dump(memos)
@@ -165,9 +163,7 @@ def semantic_search_memos(query: str, limit: int = 5, category: str = "") -> str
     if not query:
         return "Error: query is required."
     try:
-        results = semantic_search(
-            user_id, query, limit, category=category.strip() or None
-        )
+        results = semantic_search(user_id, query, limit, category=category.strip() or None)
     except EmbeddingError as e:
         return f"Error: {e}"
     if not results:

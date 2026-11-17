@@ -4,13 +4,13 @@ dynamic_prompt が公開している 12 個の MCP ツールと、それらの�
 
 ## カテゴリ別早見表
 
-| カテゴリ | ツール |
-|---------|--------|
-| セッション初期化 | `determine_language`, `get_instruction` |
-| 語彙管理 | `get_words`, `save_words`, `answer_words` |
-| 選択式クイズ | `send_quiz`, `get_quiz_results` |
-| 自由回答クイズ | `send_free_quiz`, `get_unscored_quizzes`, `score_free_answers`, `get_quiz_results` |
-| 話題管理 | `get_past_topics`, `save_story_topic` |
+| カテゴリ         | ツール                                                                             |
+| ---------------- | ---------------------------------------------------------------------------------- |
+| セッション初期化 | `determine_language`, `get_instruction`                                            |
+| 語彙管理         | `get_words`, `save_words`, `answer_words`                                          |
+| 選択式クイズ     | `send_quiz`, `get_quiz_results`                                                    |
+| 自由回答クイズ   | `send_free_quiz`, `get_unscored_quizzes`, `score_free_answers`, `get_quiz_results` |
+| 話題管理         | `get_past_topics`, `save_story_topic`                                              |
 
 ## 全体の依存関係
 

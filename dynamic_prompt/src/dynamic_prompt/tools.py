@@ -97,7 +97,6 @@ def determine_language(language: str) -> str:
     return f"Target language set to {name}. (No detailed support available; using general instructions.)"
 
 
-
 def _get_instruction_description() -> str:
     lines = [
         "Retrieve a specific instruction by name and return its full content as a system prompt.",
@@ -308,8 +307,10 @@ def get_quiz_results(limit: int = 5) -> str:
         for q in r["questions"]:
             if q.get("question_type") == "free":
                 status = (
-                    "correct" if q["is_correct"] is True
-                    else "wrong" if q["is_correct"] is False
+                    "correct"
+                    if q["is_correct"] is True
+                    else "wrong"
+                    if q["is_correct"] is False
                     else "unscored"
                 )
                 lines.append(
@@ -373,10 +374,7 @@ def send_free_quiz(title: str, questions: str) -> str:
         "session_id": session_id,
         "title": title,
         "lang": lang,
-        "questions": [
-            {"question": q["question"], "question_type": "free"}
-            for q in items
-        ],
+        "questions": [{"question": q["question"], "question_type": "free"} for q in items],
     }
     push_quiz(quiz_data)
 

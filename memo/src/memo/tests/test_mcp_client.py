@@ -218,9 +218,7 @@ def test_create_memo_rejects_unregistered_category():
     set_stdio_user("rejectcat")
     try:
         # 未登録カテゴリでのメモ作成は拒否される (先に create_category が必要)
-        result = asyncio.run(
-            _call("create_memo", {"title": "メモ", "category": "work"})
-        )
+        result = asyncio.run(_call("create_memo", {"title": "メモ", "category": "work"}))
         assert "is not registered" in result
     finally:
         set_stdio_user(None)
@@ -233,9 +231,7 @@ def test_category_filter_roundtrip():
         # 先にカテゴリを登録してからメモを作る (未登録カテゴリは拒否されるため)
         asyncio.run(_call("create_category", {"name": "work"}))
         asyncio.run(_call("create_category", {"name": "private"}))
-        created = asyncio.run(
-            _call("create_memo", {"title": "仕事メモ", "category": "work"})
-        )
+        created = asyncio.run(_call("create_memo", {"title": "仕事メモ", "category": "work"}))
         asyncio.run(_call("create_memo", {"title": "私用メモ", "category": "private"}))
         # 作成メッセージに正規化後のカテゴリが出る
         assert "category=WORK" in created
@@ -244,9 +240,7 @@ def test_category_filter_roundtrip():
         assert "仕事メモ" in listed
         assert "私用メモ" not in listed
         # search も同様に絞れる
-        searched = asyncio.run(
-            _call("search_memos", {"query": "メモ", "category": "private"})
-        )
+        searched = asyncio.run(_call("search_memos", {"query": "メモ", "category": "private"}))
         assert "私用メモ" in searched
         assert "仕事メモ" not in searched
     finally:
@@ -329,9 +323,7 @@ def test_admin_cannot_delete_last_admin():
     # admin は唯一の管理者 (最後の1人) なので削除できない
     set_stdio_user(ADMIN_USER)
     try:
-        result = asyncio.run(
-            _switch_then_call(ADMIN_USER, "delete_user", {"name": ADMIN_USER})
-        )
+        result = asyncio.run(_switch_then_call(ADMIN_USER, "delete_user", {"name": ADMIN_USER}))
     finally:
         set_stdio_user(None)
     assert "cannot delete the last admin user" in result
@@ -459,7 +451,9 @@ def test_audit_log_emits_info_line_per_tool_call(caplog):
             asyncio.run(_call("create_memo", {"title": "ログ確認"}))
     finally:
         set_stdio_user(None)
-    msgs = [r.getMessage() for r in caplog.records if r.name == "memo.server.mcp.logging_middleware"]
+    msgs = [
+        r.getMessage() for r in caplog.records if r.name == "memo.server.mcp.logging_middleware"
+    ]
     assert any("tool=create_memo" in m and "user=logwatcher" in m for m in msgs)
 
 
@@ -470,7 +464,9 @@ def test_audit_log_debug_includes_initialize(caplog):
             asyncio.run(_list_tool_names())  # 接続時に initialize が走る
     finally:
         set_stdio_user(None)
-    msgs = [r.getMessage() for r in caplog.records if r.name == "memo.server.mcp.logging_middleware"]
+    msgs = [
+        r.getMessage() for r in caplog.records if r.name == "memo.server.mcp.logging_middleware"
+    ]
     assert any("method=initialize" in m for m in msgs)
 
 

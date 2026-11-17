@@ -73,9 +73,7 @@ def _read_sqlite(source: str) -> dict:
     try:
         words = [dict(r) for r in db.execute("SELECT * FROM unknown_words").fetchall()]
         sessions = [dict(r) for r in db.execute("SELECT * FROM quiz_sessions").fetchall()]
-        questions = [
-            dict(r) for r in db.execute("SELECT * FROM quiz_questions").fetchall()
-        ]
+        questions = [dict(r) for r in db.execute("SELECT * FROM quiz_questions").fetchall()]
         topics = [dict(r) for r in db.execute("SELECT * FROM story_topics").fetchall()]
     finally:
         db.close()
@@ -140,9 +138,7 @@ def _write_firestore(client, data: dict) -> None:
     for chunk in _chunked(data["words"], _BATCH_SIZE):
         batch = client.batch()
         for row in chunk:
-            ref = client.collection(_WORDS).document(
-                _word_doc_id(row["lang"], row["word"])
-            )
+            ref = client.collection(_WORDS).document(_word_doc_id(row["lang"], row["word"]))
             batch.set(ref, _word_payload(row))  # merge=False (上書き)
         batch.commit()
 

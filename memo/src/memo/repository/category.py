@@ -97,9 +97,7 @@ def create_category_db(user_id: int, name: str) -> dict | None:
             "INSERT INTO categories (user_id, name) VALUES (?, ?)",
             (user_id, normalized),
         )
-        row = db.execute(
-            "SELECT * FROM categories WHERE id = ?", (cursor.lastrowid,)
-        ).fetchone()
+        row = db.execute("SELECT * FROM categories WHERE id = ?", (cursor.lastrowid,)).fetchone()
     return _row_to_dict(row)
 
 

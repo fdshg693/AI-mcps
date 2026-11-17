@@ -79,9 +79,7 @@ def _drop_orphans(db: sqlite3.Connection) -> None:
     """所有者が ``users`` に居ないメモ/カテゴリを削除する (移送の JOIN で落ちる行を一掃)。"""
     db.execute("DELETE FROM memos WHERE user NOT IN (SELECT name FROM users)")
     db.execute("DELETE FROM categories WHERE user NOT IN (SELECT name FROM users)")
-    db.execute(
-        "DELETE FROM memo_embeddings WHERE memo_id NOT IN (SELECT id FROM memos)"
-    )
+    db.execute("DELETE FROM memo_embeddings WHERE memo_id NOT IN (SELECT id FROM memos)")
 
 
 def _rebuild_users(db: sqlite3.Connection) -> None:
@@ -127,9 +125,7 @@ def _rebuild_categories(db: sqlite3.Connection) -> None:
     )
     db.execute("DROP TABLE categories")
     db.execute("ALTER TABLE categories_new RENAME TO categories")
-    db.execute(
-        "CREATE INDEX IF NOT EXISTS idx_categories_user_id ON categories(user_id)"
-    )
+    db.execute("CREATE INDEX IF NOT EXISTS idx_categories_user_id ON categories(user_id)")
 
 
 def _rebuild_memos(db: sqlite3.Connection) -> None:

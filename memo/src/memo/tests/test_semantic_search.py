@@ -23,6 +23,7 @@ def _register_owners(clean_tables):
     A = create_user_db("alice")["id"]
     B = create_user_db("bob")["id"]
 
+
 # 既知の概要 / クエリ → 固定ベクトル。
 # クエリ「ペットについて」と概要「犬と猫のペット」は同方向 (cosine=1.0)、
 # 概要「株式投資の話」は直交 (cosine=0.0)。

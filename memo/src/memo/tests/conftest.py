@@ -43,8 +43,7 @@ def clean_tables():
         db.execute("DELETE FROM categories")
         db.execute("DELETE FROM users")
         db.execute(
-            "INSERT OR IGNORE INTO users (name, display_name, is_admin) "
-            "VALUES (?, ?, 1)",
+            "INSERT OR IGNORE INTO users (name, display_name, is_admin) VALUES (?, ?, 1)",
             (_db_mod.ADMIN_USER, "Administrator"),
         )
         admin_id = db.execute(

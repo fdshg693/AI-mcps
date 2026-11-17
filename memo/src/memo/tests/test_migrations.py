@@ -68,7 +68,9 @@ def _seed_legacy(db: sqlite3.Connection) -> None:
     db.execute("INSERT INTO categories (user, name) VALUES ('alice', 'WORK')")
     db.execute("INSERT INTO memos (id, user, title, category) VALUES (1, 'alice', 'm', 'WORK')")
     # 孤立メモ: 所有者 ghost は users に居ない
-    db.execute("INSERT INTO memos (id, user, title, category) VALUES (2, 'ghost', 'orphan', 'OTHERS')")
+    db.execute(
+        "INSERT INTO memos (id, user, title, category) VALUES (2, 'ghost', 'orphan', 'OTHERS')"
+    )
     # 孤立埋め込み: メモ 999 は存在しない
     db.execute(
         "INSERT INTO memo_embeddings (memo_id, summary_hash, model, vector) "

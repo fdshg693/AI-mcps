@@ -15,6 +15,7 @@ from memo.repository.embedding import (
 from memo.repository.memo import create_memo_db
 from memo.repository.user import create_user_db
 
+
 @pytest.fixture
 def memo_id(clean_tables):
     """埋め込みの紐づけ先となる実メモを1件作り、その id を返す。"""

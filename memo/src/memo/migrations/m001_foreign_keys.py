@@ -77,8 +77,7 @@ def migrate(db: sqlite3.Connection) -> None:
         db.execute("ALTER TABLE memos ADD COLUMN user TEXT NOT NULL DEFAULT ''")
     if not _column_exists(db, "memos", "category"):
         db.execute(
-            "ALTER TABLE memos ADD COLUMN category TEXT NOT NULL "
-            f"DEFAULT '{OTHERS_CATEGORY}'"
+            f"ALTER TABLE memos ADD COLUMN category TEXT NOT NULL DEFAULT '{OTHERS_CATEGORY}'"
         )
 
     # テーブル作り替えは外部キー強制を OFF にし、トランザクション外で PRAGMA を
@@ -113,9 +112,7 @@ def _drop_orphans(db: sqlite3.Connection) -> None:
     """
     db.execute("DELETE FROM memos WHERE user NOT IN (SELECT name FROM users)")
     db.execute("DELETE FROM categories WHERE user NOT IN (SELECT name FROM users)")
-    db.execute(
-        "DELETE FROM memo_embeddings WHERE memo_id NOT IN (SELECT id FROM memos)"
-    )
+    db.execute("DELETE FROM memo_embeddings WHERE memo_id NOT IN (SELECT id FROM memos)")
 
 
 def _rebuild_categories(db: sqlite3.Connection) -> None:

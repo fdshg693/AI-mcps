@@ -100,9 +100,7 @@ class TestSchemaVersion:
         db = _fresh_db()
         db.execute("CREATE TABLE unknown_words (id INTEGER, lang TEXT, word TEXT)")
         _migrate(db)
-        row = db.execute(
-            "SELECT applied_at FROM schema_version WHERE version = 1"
-        ).fetchone()
+        row = db.execute("SELECT applied_at FROM schema_version WHERE version = 1").fetchone()
         assert row[0] is not None
         db.close()
 
@@ -144,9 +142,7 @@ class TestMigration001:
     def test_adds_status_column(self):
         """status カラムがない DB に追加される。"""
         db = _fresh_db()
-        db.execute(
-            "CREATE TABLE unknown_words (id INTEGER, lang TEXT, word TEXT, context TEXT)"
-        )
+        db.execute("CREATE TABLE unknown_words (id INTEGER, lang TEXT, word TEXT, context TEXT)")
         _migrate(db)
         assert _column_exists(db, "unknown_words", "status") is True
         db.close()
@@ -154,9 +150,7 @@ class TestMigration001:
     def test_adds_reviewed_at_column(self):
         """reviewed_at カラムがない DB に追加される。"""
         db = _fresh_db()
-        db.execute(
-            "CREATE TABLE unknown_words (id INTEGER, lang TEXT, word TEXT, context TEXT)"
-        )
+        db.execute("CREATE TABLE unknown_words (id INTEGER, lang TEXT, word TEXT, context TEXT)")
         _migrate(db)
         assert _column_exists(db, "unknown_words", "reviewed_at") is True
         db.close()

@@ -191,9 +191,7 @@ async def api_update_user_memo(request: Request) -> JSONResponse:
     category = category if isinstance(category, str) else None
 
     try:
-        memo = update_memo_service(
-            user["id"], memo_id, title, summary, category=category
-        )
+        memo = update_memo_service(user["id"], memo_id, title, summary, category=category)
     except TitleRequired:
         return JSONResponse({"error": "title is required"}, status_code=400)
     except UnknownCategory as e:
@@ -201,9 +199,7 @@ async def api_update_user_memo(request: Request) -> JSONResponse:
             {"error": f"category '{e.category}' is not registered"}, status_code=400
         )
     if memo is None:
-        return JSONResponse(
-            {"error": f"memo id={memo_id} not found"}, status_code=404
-        )
+        return JSONResponse({"error": f"memo id={memo_id} not found"}, status_code=404)
     return JSONResponse(memo)
 
 
@@ -216,9 +212,7 @@ async def api_delete_user_memo(request: Request) -> JSONResponse:
     except UserNotFound:
         return JSONResponse({"error": f"user '{name}' not found"}, status_code=404)
     if not delete_memo_service(user["id"], memo_id):
-        return JSONResponse(
-            {"error": f"memo id={memo_id} not found"}, status_code=404
-        )
+        return JSONResponse({"error": f"memo id={memo_id} not found"}, status_code=404)
     return JSONResponse({"deleted": memo_id})
 
 
@@ -249,9 +243,7 @@ async def api_create_user_category(request: Request) -> JSONResponse:
     except CategoryNameRequired:
         return JSONResponse({"error": "name is required"}, status_code=400)
     except CategoryAlreadyExists as e:
-        return JSONResponse(
-            {"error": f"category '{e.name}' already exists"}, status_code=409
-        )
+        return JSONResponse({"error": f"category '{e.name}' already exists"}, status_code=409)
     return JSONResponse(created, status_code=201)
 
 
@@ -268,9 +260,7 @@ async def api_rename_user_category(request: Request) -> JSONResponse:
         return JSONResponse({"error": f"user '{name}' not found"}, status_code=404)
     body = await request.json()
     try:
-        renamed = rename_category_by_id_service(
-            user["id"], category_id, str(body.get("name", ""))
-        )
+        renamed = rename_category_by_id_service(user["id"], category_id, str(body.get("name", "")))
     except CategoryNameRequired:
         return JSONResponse({"error": "name is required"}, status_code=400)
     except CannotModifyOthers as e:
@@ -278,9 +268,7 @@ async def api_rename_user_category(request: Request) -> JSONResponse:
     except CategoryNotFound as e:
         return JSONResponse({"error": str(e)}, status_code=404)
     except CategoryAlreadyExists as e:
-        return JSONResponse(
-            {"error": f"category '{e.name}' already exists"}, status_code=409
-        )
+        return JSONResponse({"error": f"category '{e.name}' already exists"}, status_code=409)
     return JSONResponse(renamed)
 
 
@@ -318,9 +306,7 @@ async def api_create_user(request: Request) -> JSONResponse:
     except NameRequired:
         return JSONResponse({"error": "name is required"}, status_code=400)
     except UserAlreadyExists as e:
-        return JSONResponse(
-            {"error": f"user '{e.name}' already exists"}, status_code=409
-        )
+        return JSONResponse({"error": f"user '{e.name}' already exists"}, status_code=409)
     return JSONResponse(created, status_code=201)
 
 

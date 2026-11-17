@@ -96,7 +96,7 @@ class GCSConfigSource:
         for b in blobs:
             if not b.name.endswith(".yaml"):
                 continue
-            rel = b.name[len(base_strip):] if base_strip else b.name
+            rel = b.name[len(base_strip) :] if base_strip else b.name
             results.append(rel)
         return sorted(results)
 

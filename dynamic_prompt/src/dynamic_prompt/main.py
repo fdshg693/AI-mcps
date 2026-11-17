@@ -48,7 +48,9 @@ mcp = FastMCP("dynamic_prompt")
 
 import dynamic_prompt.tools  # noqa: E402, F401 — ツール登録 (side-effect import)
 
-init_repo(os.environ.get("DATA_BACKEND", "sqlite"))  # fastmcp run 経由でも確実に実行されるようモジュールレベルで呼ぶ
+init_repo(
+    os.environ.get("DATA_BACKEND", "sqlite")
+)  # fastmcp run 経由でも確実に実行されるようモジュールレベルで呼ぶ
 
 
 @mcp.custom_route("/health", methods=["GET"])
@@ -100,19 +102,13 @@ def main():
 
             allowed_emails_env = os.environ.get("ALLOWED_EMAILS", "").strip()
             if allowed_emails_env:
-                allowed = {
-                    e.strip().lower()
-                    for e in allowed_emails_env.split(",")
-                    if e.strip()
-                }
+                allowed = {e.strip().lower() for e in allowed_emails_env.split(",") if e.strip()}
                 provider._token_validator = EmailAllowlistGoogleTokenVerifier(
                     allowed_emails=allowed,
                     required_scopes=required_scopes,
                 )
             else:
-                logger.warning(
-                    "ALLOWED_EMAILS is not set: any Google account can authenticate."
-                )
+                logger.warning("ALLOWED_EMAILS is not set: any Google account can authenticate.")
 
             mcp.auth = provider
 

@@ -24,10 +24,13 @@ def _get_status(db, lang: str, word: str) -> str | None:
 
 
 def _word_exists(db, lang: str, word: str) -> bool:
-    return db.execute(
-        "SELECT 1 FROM unknown_words WHERE lang = ? AND word = ?",
-        (lang, word),
-    ).fetchone() is not None
+    return (
+        db.execute(
+            "SELECT 1 FROM unknown_words WHERE lang = ? AND word = ?",
+            (lang, word),
+        ).fetchone()
+        is not None
+    )
 
 
 def _insert_word(db, lang: str, word: str, status: str):

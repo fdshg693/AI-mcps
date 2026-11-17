@@ -115,6 +115,7 @@ def write_text(self, relative_path: str, text: str) -> None: ...
 ```
 
 `LocalConfigSource.write_text`:
+
 ```python
 def write_text(self, relative_path: str, text: str) -> None:
     target = self.base_dir / relative_path
@@ -123,6 +124,7 @@ def write_text(self, relative_path: str, text: str) -> None:
 ```
 
 `GCSConfigSource.write_text`:
+
 ```python
 def write_text(self, relative_path: str, text: str) -> None:
     key = self._key(relative_path)
@@ -135,11 +137,13 @@ def write_text(self, relative_path: str, text: str) -> None:
 ### 3.4 テスト追加
 
 `tests/test_admin_api.py`:
+
 - `MCP_ADMIN_TOKEN` 未設定で `build_admin_routes()` が空リストを返す
 - httpx + ASGITransport で `/admin/api/health` への認証付き/なしリクエスト
 - `/admin/api/reload-config` 呼び出しで `config_store.reload()` が呼ばれること（monkeypatchで検証）
 
 `tests/test_config_source_write.py`:
+
 - `LocalConfigSource` で tmp_path に書き込み → 読み戻して一致
 - 親ディレクトリが存在しないパスでも書き込めること
 - (GCS版は本物のGCSを叩くテストは書かない。fakeでもMockでもよいが優先度低 — 一旦スキップ)

@@ -70,8 +70,7 @@ def create_user(name: str, display_name: str = "", note: str = "") -> str:
 
 @mcp.tool(
     description=(
-        "(admin 専用) 登録済みユーザーの一覧を名前順に取得する。\n\n"
-        "ユーザーの配列を JSON で返す。"
+        "(admin 専用) 登録済みユーザーの一覧を名前順に取得する。\n\nユーザーの配列を JSON で返す。"
     ),
     tags={ADMIN_TOOL_TAG},
 )
@@ -193,11 +192,7 @@ async def switch_user(target: str, ctx: Context) -> str:
 
     # 切り替え先ユーザーが持つカテゴリ一覧を添える (カテゴリはユーザー単位・id 紐付け)。
     categories = [c["name"] for c in list_categories(target_user["id"])]
-    cat_note = (
-        "カテゴリ: " + ", ".join(categories)
-        if categories
-        else "(カテゴリはまだありません)"
-    )
+    cat_note = "カテゴリ: " + ", ".join(categories) if categories else "(カテゴリはまだありません)"
 
     if not transport_is_http():
         # stdio: モジュール変数を実行時書き換え (GIL 下の単純代入で安全)

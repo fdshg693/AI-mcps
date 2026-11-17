@@ -80,9 +80,7 @@ def validate() -> list[str]:
         # 4. 宣言されているのにテンプレートで使われていない変数
         unused = declared_all - used
         if unused:
-            errors.append(
-                f"[{name}] variables に宣言されているがテンプレートで未使用: {unused}"
-            )
+            errors.append(f"[{name}] variables に宣言されているがテンプレートで未使用: {unused}")
 
     return errors
 

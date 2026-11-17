@@ -125,9 +125,7 @@ class ConfigStore:
         ttl_seconds: float | None = None,
     ) -> None:
         self._source: ConfigSource = source or make_config_source()
-        self._ttl: float = (
-            ttl_seconds if ttl_seconds is not None else _default_ttl_seconds()
-        )
+        self._ttl: float = ttl_seconds if ttl_seconds is not None else _default_ttl_seconds()
         self._lock = threading.RLock()
         self._cache: dict[str, Any] = {}
         self._last_loaded: float = 0.0

@@ -4,17 +4,17 @@ Covers `mcps/dynamic_prompt/src/dynamic_prompt/` excluding the repository/DB lay
 
 ## Module structure
 
-| Module | Responsibility |
-|--------|---------------|
-| `models.py` | Dataclasses (`Language`, `UserConfig`, `AppConfig`, `Instruction`) — all `frozen=True` |
-| `config_source.py` | `ConfigSource` abstraction (`LocalConfigSource` / `GCSConfigSource`) + factory, switched by `PROMPTS_URI` |
-| `config.py` | YAML loading, path constants, TTL-cached `ConfigStore` (`config_store` singleton). Checks TTL on every access and auto-refreshes |
-| `session.py` | `_Session` class + singleton — holds the current target language |
-| `tools.py` | Variable resolvers, template rendering, vocab/quiz/story tools, and the 13 `@mcp.tool` functions. DB access via `get_repo()` |
-| `main.py` | `mcp` FastMCP instance + entry point (`main()`), transport switch (`TRANSPORT` env), `/health`, OAuth (HTTP mode), starts quiz server (stdio only) |
-| `quiz_server.py` | Starlette + uvicorn quiz web server (SSE, REST, word-save API). Runs in a daemon thread |
-| `static/quiz.html` / `.css` / `.js` | Quiz UI (SSE connect, answer submit, word save) |
-| `validate.py` | YAML configuration consistency checker |
+| Module                              | Responsibility                                                                                                                                     |
+| ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `models.py`                         | Dataclasses (`Language`, `UserConfig`, `AppConfig`, `Instruction`) — all `frozen=True`                                                             |
+| `config_source.py`                  | `ConfigSource` abstraction (`LocalConfigSource` / `GCSConfigSource`) + factory, switched by `PROMPTS_URI`                                          |
+| `config.py`                         | YAML loading, path constants, TTL-cached `ConfigStore` (`config_store` singleton). Checks TTL on every access and auto-refreshes                   |
+| `session.py`                        | `_Session` class + singleton — holds the current target language                                                                                   |
+| `tools.py`                          | Variable resolvers, template rendering, vocab/quiz/story tools, and the 13 `@mcp.tool` functions. DB access via `get_repo()`                       |
+| `main.py`                           | `mcp` FastMCP instance + entry point (`main()`), transport switch (`TRANSPORT` env), `/health`, OAuth (HTTP mode), starts quiz server (stdio only) |
+| `quiz_server.py`                    | Starlette + uvicorn quiz web server (SSE, REST, word-save API). Runs in a daemon thread                                                            |
+| `static/quiz.html` / `.css` / `.js` | Quiz UI (SSE connect, answer submit, word save)                                                                                                    |
+| `validate.py`                       | YAML configuration consistency checker                                                                                                             |
 
 `main.py` creates the `mcp` instance; `tools.py` imports it via side-effect import to register tools. `init_db()` runs at module level so DB init happens on every startup path.
 
@@ -41,13 +41,13 @@ Covers `mcps/dynamic_prompt/src/dynamic_prompt/` excluding the repository/DB lay
 - Cross-thread comms: `asyncio.Queue` + `asyncio.run_coroutine_threadsafe()` (sync MCP tool → async SSE).
 - Word save: browser form → `POST /api/save_words` → DB directly; picked up by the next `get_words` call (async hand-off).
 
-| Method | Path | Description |
-|--------|------|--------------|
-| GET | `/` | serve quiz.html |
-| GET | `/events` | SSE push |
-| GET | `/api/pending` | unanswered quizzes |
-| POST | `/api/submit` | submit + score |
-| POST | `/api/save_words` | save words from the UI (lang, words, context) |
+| Method | Path              | Description                                   |
+| ------ | ----------------- | --------------------------------------------- |
+| GET    | `/`               | serve quiz.html                               |
+| GET    | `/events`         | SSE push                                      |
+| GET    | `/api/pending`    | unanswered quizzes                            |
+| POST   | `/api/submit`     | submit + score                                |
+| POST   | `/api/save_words` | save words from the UI (lang, words, context) |
 
 ## Configuration-driven design
 
@@ -55,10 +55,10 @@ Behavior is driven by YAML under `src/dynamic_prompt/prompts/` (or GCS, see belo
 
 **External storage (`PROMPTS_URI`)**: `config_source.py` abstracts local filesystem vs. GCS.
 
-| `PROMPTS_URI` | Behavior |
-|---|---|
-| unset (default) | `LocalConfigSource` reads `src/dynamic_prompt/prompts/` |
-| `/abs/path` | `LocalConfigSource` reads that path |
+| `PROMPTS_URI`        | Behavior                                                       |
+| -------------------- | -------------------------------------------------------------- |
+| unset (default)      | `LocalConfigSource` reads `src/dynamic_prompt/prompts/`        |
+| `/abs/path`          | `LocalConfigSource` reads that path                            |
 | `gs://bucket/prefix` | `GCSConfigSource` (google-cloud-storage SDK) reads that prefix |
 
 Cloud Run sets `PROMPTS_URI=gs://${project_id}-dp-data/prompts`; upload via `just upload-prompts` (`gsutil rsync`). `validate.py` is local-YAML-only, for pre-upload checks.

@@ -31,27 +31,27 @@ Windows: `justfile` sets `windows-shell` to Git Bash (`C:/Program Files/Git/usr/
 
 ## Layout
 
-| Path | Content |
-|------|---------|
-| `Dockerfile` | Python 3.13-slim + uv. Build context is the **repo root** (`my_ai_tools/`) — pass `-f` to point at this Dockerfile |
-| `firestore-emulator.compose.yml` | Official Cloud SDK emulator image (bundles Java, no host JDK needed). Port 8085 with healthcheck |
-| `cloudbuild.yaml` | Cloud Build definition; `_IMAGE` substitution var sets the registry path |
-| `terraform/` | Cloud Run, Artifact Registry, GCS, IAM |
+| Path                             | Content                                                                                                            |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `Dockerfile`                     | Python 3.13-slim + uv. Build context is the **repo root** (`my_ai_tools/`) — pass `-f` to point at this Dockerfile |
+| `firestore-emulator.compose.yml` | Official Cloud SDK emulator image (bundles Java, no host JDK needed). Port 8085 with healthcheck                   |
+| `cloudbuild.yaml`                | Cloud Build definition; `_IMAGE` substitution var sets the registry path                                           |
+| `terraform/`                     | Cloud Run, Artifact Registry, GCS, IAM                                                                             |
 
 **Dockerfile**: separates dependency install from code copy for cache efficiency. Default env: `TRANSPORT=http`, `HOST=0.0.0.0`, `PORT=8080`, `DB_PATH=/data/vocab.db`. Cloud Run YAML source: `PROMPTS_URI=gs://${project_id}-dp-data/prompts`, `CONFIG_TTL_SECONDS=60` — sync YAML via `just upload-prompts`, apply immediately by calling the `reload_config` MCP tool.
 
 ## Terraform
 
-| File | Content |
-|------|---------|
-| `main.tf` | Provider, API enablement |
-| `variables.tf` | `project_id`, `region`, `image_tag`, `google_client_id`, `google_client_secret`, `service_url`, `allowed_emails` |
-| `terraform.tfvars` | Actual values (gitignored) |
-| `registry.tf` | Artifact Registry (Docker) |
-| `storage.tf` | GCS bucket (`prevent_destroy`) — SQLite persistence |
-| `cloud_run.tf` | Cloud Run v2, `max_instance_count = 1`, GCS volume mount |
-| `iam.tf` | `allUsers` → `roles/run.invoker` |
-| `outputs.tf` | `service_url`, `mcp_endpoint`, `image_repo` |
+| File               | Content                                                                                                          |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| `main.tf`          | Provider, API enablement                                                                                         |
+| `variables.tf`     | `project_id`, `region`, `image_tag`, `google_client_id`, `google_client_secret`, `service_url`, `allowed_emails` |
+| `terraform.tfvars` | Actual values (gitignored)                                                                                       |
+| `registry.tf`      | Artifact Registry (Docker)                                                                                       |
+| `storage.tf`       | GCS bucket (`prevent_destroy`) — SQLite persistence                                                              |
+| `cloud_run.tf`     | Cloud Run v2, `max_instance_count = 1`, GCS volume mount                                                         |
+| `iam.tf`           | `allUsers` → `roles/run.invoker`                                                                                 |
+| `outputs.tf`       | `service_url`, `mcp_endpoint`, `image_repo`                                                                      |
 
 ## GCP environment
 

@@ -29,9 +29,7 @@ from pathlib import Path
 
 # __file__ = src/memo/infra/database.py → parent.parent = src/memo (memo.db の場所)。
 # infra/ へ移動して1階層深くなったぶん parent.parent で従来と同じ場所を指す。
-DB_PATH = Path(
-    os.environ.get("MEMO_DB_PATH", str(Path(__file__).parent.parent / "memo.db"))
-)
+DB_PATH = Path(os.environ.get("MEMO_DB_PATH", str(Path(__file__).parent.parent / "memo.db")))
 
 #: ブートストラップ用の既定管理者ユーザー名。init_db() で必ずシードされ、
 #: ``is_admin=1`` が付与される。**管理者権限は名前ではなく ``users.is_admin``
@@ -123,9 +121,7 @@ def _create_indexes(db: sqlite3.Connection) -> None:
     ``init_db`` のマイグレーション後にここで作成する。新規 DB でも同様に作る。
     """
     db.execute("CREATE INDEX IF NOT EXISTS idx_memos_user_id ON memos(user_id)")
-    db.execute(
-        "CREATE INDEX IF NOT EXISTS idx_categories_user_id ON categories(user_id)"
-    )
+    db.execute("CREATE INDEX IF NOT EXISTS idx_categories_user_id ON categories(user_id)")
 
 
 def _create_triggers(db: sqlite3.Connection) -> None:

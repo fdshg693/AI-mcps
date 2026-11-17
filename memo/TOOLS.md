@@ -4,13 +4,13 @@ memo が公開している 15 個の MCP ツールと、その使い方・注意
 
 ## カテゴリ別早見表
 
-| カテゴリ | ツール |
-|---------|--------|
-| メモ CRUD | `create_memo`, `get_memo`, `list_memos`, `update_memo`, `delete_memo` |
-| メモ検索 | `search_memos` (タイトル部分一致), `semantic_search_memos` (概要の意味検索) |
-| カテゴリ (作成・閲覧のみ) | `create_category`, `list_categories` |
-| ユーザー管理 (admin 専用) | `create_user`, `get_user`, `list_users`, `update_user`, `delete_user` |
-| セッション | `switch_user` (現在ユーザーの切り替え。admin 専用ではない) |
+| カテゴリ                  | ツール                                                                      |
+| ------------------------- | --------------------------------------------------------------------------- |
+| メモ CRUD                 | `create_memo`, `get_memo`, `list_memos`, `update_memo`, `delete_memo`       |
+| メモ検索                  | `search_memos` (タイトル部分一致), `semantic_search_memos` (概要の意味検索) |
+| カテゴリ (作成・閲覧のみ) | `create_category`, `list_categories`                                        |
+| ユーザー管理 (admin 専用) | `create_user`, `get_user`, `list_users`, `update_user`, `delete_user`       |
+| セッション                | `switch_user` (現在ユーザーの切り替え。admin 専用ではない)                  |
 
 ## 前提: 接続ユーザーと権限
 
