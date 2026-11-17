@@ -1,0 +1,29 @@
+[project]
+name = "memo"
+version = "0.1.0"
+description = "シンプルなメモ管理MCPサーバー (タイトル・概要のCRUDとタイトル部分一致検索・概要のセマンティック検索)"
+requires-python = ">=3.13"
+dependencies = [
+    "fastmcp>=3.1.0",
+    "openai>=1.0",
+    "python-dotenv>=1.0",
+    "uvicorn>=0.30",
+]
+
+[project.scripts]
+memo = "memo.server.mcp.main:main"
+memo-admin = "memo.server.web.main:main"
+memo-migrate = "memo.migrations.__main__:main"
+
+[dependency-groups]
+dev = ["pytest>=8.0", "httpx>=0.27"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/memo"]
+
+[tool.uv]
+package = true

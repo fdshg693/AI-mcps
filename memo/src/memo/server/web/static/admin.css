@@ -1,0 +1,174 @@
+:root {
+  --bg: #f5f7fa;
+  --card-bg: #ffffff;
+  --text: #1a1a2e;
+  --text-secondary: #6b7280;
+  --border: #e5e7eb;
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --danger: #dc2626;
+  --danger-hover: #b91c1c;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f172a;
+    --card-bg: #1e293b;
+    --text: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --border: #334155;
+    --primary: #818cf8;
+    --primary-hover: #6366f1;
+    --danger: #f87171;
+    --danger-hover: #ef4444;
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Noto Sans JP", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 24px 16px;
+}
+
+.container { max-width: 960px; margin: 0 auto; }
+
+header { margin-bottom: 24px; }
+header h1 { font-size: 1.5rem; }
+.subtitle { color: var(--text-secondary); margin-top: 4px; font-size: 0.9rem; }
+
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.card h2 { font-size: 1.05rem; margin-bottom: 14px; }
+.card-head { display: flex; align-items: center; justify-content: space-between; }
+.card-head h2 { margin-bottom: 0; }
+
+.row { display: flex; gap: 10px; flex-wrap: wrap; }
+.row input { flex: 1 1 160px; }
+
+.head-actions { display: flex; gap: 8px; align-items: center; }
+
+/* メモ編集画面の縦並びフォーム */
+.form-vertical { display: flex; flex-direction: column; gap: 16px; }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field-label { font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; }
+.form-vertical input,
+.form-vertical select,
+.form-vertical textarea {
+  width: 100%;
+  font: inherit;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+}
+.form-vertical textarea { resize: vertical; min-height: 120px; line-height: 1.5; }
+.form-vertical input:focus,
+.form-vertical select:focus,
+.form-vertical textarea:focus { outline: 2px solid var(--primary); outline-offset: -1px; }
+.form-actions { display: flex; gap: 10px; }
+
+input {
+  font: inherit;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+}
+input:focus { outline: 2px solid var(--primary); outline-offset: -1px; }
+
+button {
+  font: inherit;
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 16px;
+  transition: background 0.15s;
+}
+button.primary { background: var(--primary); color: #fff; }
+button.primary:hover { background: var(--primary-hover); }
+button.ghost { background: transparent; color: var(--text-secondary); border: 1px solid var(--border); }
+button.ghost:hover { color: var(--text); }
+button.link { background: transparent; color: var(--primary); padding: 4px 8px; }
+button.link.danger { color: var(--danger); }
+button.link.danger:hover { color: var(--danger-hover); }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+table { width: 100%; border-collapse: collapse; margin-top: 14px; }
+th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--border); font-size: 0.92rem; }
+th { color: var(--text-secondary); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.03em; }
+td .name { font-weight: 600; }
+td .badge { font-size: 0.7rem; color: var(--text-secondary); border: 1px solid var(--border); border-radius: 6px; padding: 1px 6px; margin-left: 6px; }
+.actions-col { width: 1%; white-space: nowrap; }
+td.actions { white-space: nowrap; }
+td .muted { color: var(--text-secondary); }
+
+td input { width: 100%; padding: 6px 8px; font-size: 0.9rem; }
+
+.empty { color: var(--text-secondary); padding: 16px 8px; font-size: 0.9rem; }
+
+.id-col { width: 1%; white-space: nowrap; }
+td.summary { color: var(--text-secondary); }
+
+.admin-col { width: 1%; white-space: nowrap; text-align: center; }
+td.admin-cell { text-align: center; }
+td.admin-cell input { width: auto; }
+.row .checkbox { display: flex; align-items: center; gap: 4px; flex: 0 0 auto; white-space: nowrap; font-size: 0.9rem; color: var(--text-secondary); }
+.row .checkbox input { flex: 0 0 auto; width: auto; }
+
+/* メモのカテゴリ表示 (一覧のバッジ) と絞り込み欄 */
+.cat-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--primary) 30%, transparent);
+  border-radius: 6px;
+  padding: 1px 8px;
+  white-space: nowrap;
+}
+.memo-filter { display: flex; align-items: center; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.memo-filter label { font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; }
+.memo-filter select { flex: 0 1 220px; padding: 6px 10px; font-size: 0.9rem; font: inherit;
+  border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); }
+
+/* カテゴリ追加フォームの select (なければ無視されるだけ) と行内 select */
+select {
+  font: inherit;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+}
+select:focus { outline: 2px solid var(--primary); outline-offset: -1px; }
+
+.pager { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 14px; }
+.pager .muted { color: var(--text-secondary); font-size: 0.85rem; }
+
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--text);
+  color: var(--bg);
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  box-shadow: var(--shadow);
+  z-index: 10;
+}
+.toast.error { background: var(--danger); color: #fff; }

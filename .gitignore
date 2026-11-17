@@ -1,0 +1,28 @@
+*.log
+*.env
+*.bak
+
+# VSCODE
+.vscode/mcp.json
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+*.egg-info/
+
+# Ruff
+.ruff_cache
+
+# SQLite
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+
+# Terraform
+*terraform.tfvars
+*.tfstate*
+.terraform/

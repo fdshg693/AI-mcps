@@ -1,0 +1,33 @@
+# Firestore エミュレータ (ローカルテスト用)
+#
+# ホストに JDK を入れずに済むよう、Java 同梱の公式 Cloud SDK イメージ内で
+# エミュレータを動かす。`DATA_BACKEND=firestore` の契約テスト・移行スクリプトの
+# 動作確認に使う。
+#
+# 使い方:
+#   cd mcps/dynamic_prompt/infra
+#   docker compose -f firestore-emulator.compose.yml up -d --wait
+#   # 別シェルで
+#   $env:FIRESTORE_EMULATOR_HOST="127.0.0.1:8085"
+#   $env:GOOGLE_CLOUD_PROJECT="dynamic-prompt-mcp-test"
+#   uv run --project mcps/dynamic_prompt pytest mcps/dynamic_prompt/src/dynamic_prompt/tests/test_repo_contract.py -v
+#   docker compose -f firestore-emulator.compose.yml down
+#
+# `just emulator-up` / `just test-firestore` / `just emulator-down` でも操作可能。
+
+services:
+  firestore-emulator:
+    image: gcr.io/google.com/cloudsdktool/google-cloud-cli:emulators
+    container_name: firestore-emulator
+    command: >
+      gcloud beta emulators firestore start
+      --host-port=0.0.0.0:8085
+      --project=dynamic-prompt-mcp-test
+    ports:
+      - "8085:8085"
+    healthcheck:
+      # エミュレータのルートは GET で "Ok" を返す
+      test: ["CMD-SHELL", "curl -sf http://localhost:8085/ || exit 1"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
