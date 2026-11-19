@@ -89,6 +89,7 @@ def init_repo(backend: str = "sqlite") -> RepoBundle:
 または `pytest.mark.parametrize("backend", ["sqlite", "firestore"])` 形式で各テスト関数を二重実行する方式も可。
 
 具体的な実装方針:
+
 - 既存テスト群（`test_database.py` → `test_repo.py` にリネーム検討）をリポジトリ非依存に書き換え、`get_repo()` 経由でデータ操作
 - conftestで `init_repo(backend)` をパラメータ化したフィクスチャを提供
 - Firestoreエミュレータが立っていない時は自動スキップ
@@ -105,6 +106,7 @@ uv run python -m dynamic_prompt.migrate_to_firestore \
 ```
 
 処理:
+
 1. SQLite を読み込み、各テーブルの件数をログ
 2. 各テーブルを Firestore に書き込み（500件バッチ）
    - `unknown_words` → `set(merge=False)` で自然IDに upsert

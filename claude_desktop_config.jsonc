@@ -1,13 +1,17 @@
-// claude_desktop_config.jsoncの例
-// Claude Desktop から MCP サーバーに 接続するための設定ファイルの例です。
+// claude_desktop_config.jsonc の例
+// Claude Desktop から MCP サーバーに接続するための設定ファイルの例です。
+// `your/path/to/AI` はアンブレラ（fdshg693/AI）の clone 先。パッケージはアンブレラの
+// uv workspace のメンバーなので、--directory でアンブレラを指し --package で選ぶ。
 {
     "mcpServers": {
         "dynamic_prompt": {
             "command": "uv",
             "args": [
                 "run",
-                "--project",
-                "your/path/to/my_ai_tools",
+                "--directory",
+                "your/path/to/AI",
+                "--package",
+                "dynamic_prompt",
                 "dynamic_prompt"
             ]
         },
@@ -15,8 +19,10 @@
             "command": "uv",
             "args": [
                 "run",
-                "--project",
-                "your/path/to/my_ai_tools",
+                "--directory",
+                "your/path/to/AI",
+                "--package",
+                "memo",
                 "memo",
                 "--user",
                 "claude_desktop_stdio" // ユーザー名を指定して、ユーザー専用のメモを管理できるようにする

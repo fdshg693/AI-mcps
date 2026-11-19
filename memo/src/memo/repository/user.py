@@ -111,9 +111,7 @@ def update_user_db(
         if fields:
             fields.append("updated_at = datetime('now')")
             params.append(name)
-            db.execute(
-                f"UPDATE users SET {', '.join(fields)} WHERE name = ?", params
-            )
+            db.execute(f"UPDATE users SET {', '.join(fields)} WHERE name = ?", params)
         row = db.execute("SELECT * FROM users WHERE name = ?", (name,)).fetchone()
     return _user_row_to_dict(row)
 

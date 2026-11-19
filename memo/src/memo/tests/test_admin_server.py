@@ -124,9 +124,7 @@ def test_create_user_defaults_non_admin(client):
 
 
 def test_create_admin_user(client):
-    body = client.post(
-        "/api/users", json={"name": "root", "is_admin": True}
-    ).json()
+    body = client.post("/api/users", json={"name": "root", "is_admin": True}).json()
     assert body["is_admin"] is True
 
 
@@ -238,9 +236,7 @@ def test_list_user_memos_invalid_params_fallback(client):
 
 def test_create_user_memo(client):
     client.post("/api/users", json={"name": "mona"})
-    res = client.post(
-        "/api/users/mona/memos", json={"title": "T", "summary": "S"}
-    )
+    res = client.post("/api/users/mona/memos", json={"title": "T", "summary": "S"})
     assert res.status_code == 201
     body = res.json()
     assert body["title"] == "T"
@@ -289,9 +285,7 @@ def test_update_user_memo_partial(client):
     client.post("/api/users", json={"name": "quinn"})
     memo = _memo("quinn", "keep", "keep-summary")
     # summary だけ更新。title 省略 → 変更しない
-    res = client.put(
-        f"/api/users/quinn/memos/{memo['id']}", json={"summary": "changed"}
-    )
+    res = client.put(f"/api/users/quinn/memos/{memo['id']}", json={"summary": "changed"})
     assert res.status_code == 200
     body = res.json()
     assert body["title"] == "keep"
@@ -310,9 +304,7 @@ def test_update_user_memo_other_user_404(client):
     client.post("/api/users", json={"name": "tina"})
     memo = _memo("tina", "tina-memo")
     # sam のパスで tina のメモを更新しようとしても見つからない (完全分離)
-    res = client.put(
-        f"/api/users/sam/memos/{memo['id']}", json={"title": "hack"}
-    )
+    res = client.put(f"/api/users/sam/memos/{memo['id']}", json={"title": "hack"})
     assert res.status_code == 404
     # tina のメモは変わっていない
     body = client.get("/api/users/tina/memos").json()
@@ -358,9 +350,7 @@ def test_delete_user_memo_missing_404(client):
 def test_create_user_memo_with_category(client):
     client.post("/api/users", json={"name": "cat-a"})
     client.post("/api/users/cat-a/categories", json={"name": "work"})
-    res = client.post(
-        "/api/users/cat-a/memos", json={"title": "T", "category": "work"}
-    )
+    res = client.post("/api/users/cat-a/memos", json={"title": "T", "category": "work"})
     assert res.status_code == 201
     assert res.json()["category"] == "WORK"  # 大文字に正規化
 
@@ -374,9 +364,7 @@ def test_create_user_memo_defaults_category_others(client):
 def test_create_user_memo_rejects_unregistered_category(client):
     client.post("/api/users", json={"name": "cat-x"})
     # カテゴリ未登録で指定すると 400 (先に作成が必要)
-    res = client.post(
-        "/api/users/cat-x/memos", json={"title": "T", "category": "work"}
-    )
+    res = client.post("/api/users/cat-x/memos", json={"title": "T", "category": "work"})
     assert res.status_code == 400
 
 
@@ -384,9 +372,7 @@ def test_update_user_memo_category(client):
     client.post("/api/users", json={"name": "cat-c"})
     client.post("/api/users/cat-c/categories", json={"name": "private"})
     memo = _memo("cat-c", "T", "", category="work")
-    res = client.put(
-        f"/api/users/cat-c/memos/{memo['id']}", json={"category": "private"}
-    )
+    res = client.put(f"/api/users/cat-c/memos/{memo['id']}", json={"category": "private"})
     assert res.status_code == 200
     assert res.json()["category"] == "PRIVATE"
 
@@ -456,9 +442,7 @@ def test_create_category_missing_user_404(client):
 def test_rename_category_cascades_to_memos(client):
     client.post("/api/users", json={"name": "kat-e"})
     client.post("/api/users/kat-e/categories", json={"name": "work"})
-    memo = client.post(
-        "/api/users/kat-e/memos", json={"title": "m", "category": "work"}
-    ).json()
+    memo = client.post("/api/users/kat-e/memos", json={"title": "m", "category": "work"}).json()
     cid = _cat_id(client, "kat-e", "WORK")
 
     res = client.put(f"/api/users/kat-e/categories/{cid}", json={"name": "job"})
@@ -494,9 +478,7 @@ def test_rename_missing_category_404(client):
 def test_delete_category_reassigns_memos_to_others(client):
     client.post("/api/users", json={"name": "kat-i"})
     client.post("/api/users/kat-i/categories", json={"name": "work"})
-    memo = client.post(
-        "/api/users/kat-i/memos", json={"title": "m", "category": "work"}
-    ).json()
+    memo = client.post("/api/users/kat-i/memos", json={"title": "m", "category": "work"}).json()
     cid = _cat_id(client, "kat-i", "WORK")
 
     res = client.delete(f"/api/users/kat-i/categories/{cid}")

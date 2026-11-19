@@ -22,7 +22,15 @@ class TestInitDb:
         with _connect_db() as db:
             cols = db.execute("PRAGMA table_info(unknown_words)").fetchall()
             col_names = [c[1] for c in cols]
-            for expected in ("id", "lang", "word", "context", "status", "reviewed_at", "created_at"):
+            for expected in (
+                "id",
+                "lang",
+                "word",
+                "context",
+                "status",
+                "reviewed_at",
+                "created_at",
+            ):
                 assert expected in col_names
 
     def test_creates_quiz_sessions_table(self):
@@ -37,8 +45,14 @@ class TestInitDb:
             cols = db.execute("PRAGMA table_info(quiz_questions)").fetchall()
             col_names = [c[1] for c in cols]
             for expected in (
-                "id", "session_id", "question_index", "question_text",
-                "choices", "correct_index", "user_answer", "is_correct",
+                "id",
+                "session_id",
+                "question_index",
+                "question_text",
+                "choices",
+                "correct_index",
+                "user_answer",
+                "is_correct",
             ):
                 assert expected in col_names
 
@@ -94,12 +108,17 @@ class TestSaveQuizSession:
             assert qs[1][2] == 1
 
     def test_session_starts_as_pending(self):
-        sid = save_quiz_session("en", "Pending", [
-            {"question": "Q", "choices": ["A", "B"], "correct_index": 0},
-        ])
+        sid = save_quiz_session(
+            "en",
+            "Pending",
+            [
+                {"question": "Q", "choices": ["A", "B"], "correct_index": 0},
+            ],
+        )
         with _connect_db() as db:
             row = db.execute(
-                "SELECT submitted_at FROM quiz_sessions WHERE id = ?", (sid,),
+                "SELECT submitted_at FROM quiz_sessions WHERE id = ?",
+                (sid,),
             ).fetchone()
             assert row[0] is None
 
@@ -142,14 +161,17 @@ class TestSubmitQuizAnswers:
         submit_quiz_answers(sid, [0, 1])
         with _connect_db() as db:
             row = db.execute(
-                "SELECT submitted_at FROM quiz_sessions WHERE id = ?", (sid,),
+                "SELECT submitted_at FROM quiz_sessions WHERE id = ?",
+                (sid,),
             ).fetchone()
             assert row[0] is not None
 
     def test_result_details_structure(self):
-        sid = self._make_session([
-            {"question": "What?", "choices": ["Yes", "No"], "correct_index": 0},
-        ])
+        sid = self._make_session(
+            [
+                {"question": "What?", "choices": ["Yes", "No"], "correct_index": 0},
+            ]
+        )
         result = submit_quiz_answers(sid, [1])
         detail = result["details"][0]
         assert detail["question_index"] == 0
@@ -194,13 +216,21 @@ class TestGetPendingQuiz:
 
     def test_returns_pending_even_with_submitted(self):
         """提出済みと未回答が混在する場合、未回答のものを返す。"""
-        sid_old = save_quiz_session("en", "Old", [
-            {"question": "Q", "choices": ["A", "B"], "correct_index": 0},
-        ])
+        sid_old = save_quiz_session(
+            "en",
+            "Old",
+            [
+                {"question": "Q", "choices": ["A", "B"], "correct_index": 0},
+            ],
+        )
         submit_quiz_answers(sid_old, [0])
-        save_quiz_session("en", "New", [
-            {"question": "Q", "choices": ["X", "Y"], "correct_index": 1},
-        ])
+        save_quiz_session(
+            "en",
+            "New",
+            [
+                {"question": "Q", "choices": ["X", "Y"], "correct_index": 1},
+            ],
+        )
         pending = get_pending_quiz()
         assert pending is not None
         assert pending["title"] == "New"
@@ -231,9 +261,13 @@ class TestGetQuizResultsDb:
         assert results[0]["total_count"] == 1
 
     def test_excludes_pending_quizzes(self):
-        save_quiz_session("en", "Pending", [
-            {"question": "Q", "choices": ["A", "B"], "correct_index": 0},
-        ])
+        save_quiz_session(
+            "en",
+            "Pending",
+            [
+                {"question": "Q", "choices": ["A", "B"], "correct_index": 0},
+            ],
+        )
         results = get_quiz_results_db("en")
         assert len(results) == 0
 
@@ -293,9 +327,7 @@ class TestSaveWordsDb:
     def test_preserves_existing_status(self):
         save_words_db("en", ["grape"])
         with _connect_db() as db:
-            db.execute(
-                "UPDATE unknown_words SET status = 'wrong' WHERE word = 'grape'"
-            )
+            db.execute("UPDATE unknown_words SET status = 'wrong' WHERE word = 'grape'")
         save_words_db("en", ["grape"], context="new context")
         with _connect_db() as db:
             row = db.execute(

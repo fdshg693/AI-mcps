@@ -36,8 +36,7 @@ def _get_client():
     key = os.environ.get("OPENAI_API_KEY")
     if not key:
         raise EmbeddingError(
-            "OPENAI_API_KEY is not set. "
-            "環境変数に OpenAI API キーを設定してください。"
+            "OPENAI_API_KEY is not set. 環境変数に OpenAI API キーを設定してください。"
         )
     if _client is None:
         from openai import OpenAI

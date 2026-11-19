@@ -26,12 +26,14 @@ AI に外国語学習を伴走させるための MCP サーバー。AI 単体で
 
 ## 導入
 
+コマンドはアンブレラ（fdshg693/AI）のルートで実行する（パッケージはアンブレラの uv workspace のメンバー）。
+
 ### 1. ローカル実行 (stdio)
 
 Claude Desktop など stdio で接続するクライアント向け。
 
 ```bash
-uv run dynamic_prompt
+uv run --package dynamic_prompt dynamic_prompt
 ```
 
 - MCP サーバーと一緒にクイズ Web サーバー (`http://127.0.0.1:8765` 付近) が自動起動する。ポートは `8765–8767` のプールから空いているものを使う ([app_config.yaml](src/dynamic_prompt/prompts/app_config.yaml) で変更可)。
@@ -40,30 +42,30 @@ uv run dynamic_prompt
 
 ### 2. リモート実行 (HTTP + OAuth)
 
-Claude Web (claude.ai) など HTTP で接続するクライアント向け。Cloud Run へのデプロイ手順は [infra/CLAUDE.md](infra/CLAUDE.md) を参照。
+Claude Web (claude.ai) など HTTP で接続するクライアント向け。Cloud Run へのデプロイ手順は [docs/INFRA.md](docs/INFRA.md) を参照。
 
 ```bash
 TRANSPORT=http PORT=8080 \
 GOOGLE_CLIENT_ID=...  GOOGLE_CLIENT_SECRET=... \
 SERVICE_URL=https://<your-host> \
-uv run dynamic_prompt
+uv run --package dynamic_prompt dynamic_prompt
 ```
 
-| 環境変数 | 用途 |
-|---------|------|
-| `TRANSPORT` | `http` で HTTP モード。未設定 / `stdio` で stdio モード |
-| `PORT` / `HOST` | uvicorn のバインド先 |
+| 環境変数                                    | 用途                                                                                      |
+| ------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `TRANSPORT`                                 | `http` で HTTP モード。未設定 / `stdio` で stdio モード                                   |
+| `PORT` / `HOST`                             | uvicorn のバインド先                                                                      |
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | 設定されていれば `/mcp` を Google OAuth で保護する。未設定なら認証なし (ローカル開発向け) |
-| `SERVICE_URL` | OAuth コールバックの `base_url`。本番は公開 URL を指定 |
-| `DB_PATH` | SQLite DB のパス。Cloud Run では GCS マウント上を指す |
+| `SERVICE_URL`                               | OAuth コールバックの `base_url`。本番は公開 URL を指定                                    |
+| `DB_PATH`                                   | SQLite DB のパス。Cloud Run では GCS マウント上を指す                                     |
 
 HTTP モードでは単一ポートで以下を提供する。
 
-| Path | 用途 |
-|------|------|
-| `/mcp` | MCP エンドポイント (OAuth 保護対象) |
-| `/health` | ヘルスチェック (認証不要) |
-| `/` `/events` `/api/*` `/static/*` | クイズ Web UI (認証不要) |
+| Path                               | 用途                                |
+| ---------------------------------- | ----------------------------------- |
+| `/mcp`                             | MCP エンドポイント (OAuth 保護対象) |
+| `/health`                          | ヘルスチェック (認証不要)           |
+| `/` `/events` `/api/*` `/static/*` | クイズ Web UI (認証不要)            |
 
 ## このサーバー固有の認証フロー
 
@@ -100,15 +102,15 @@ curl -X POST https://<SERVICE_URL>/register \
 
 YAML を編集するだけで挙動を変えられる。
 
-| ファイル | 内容 |
-|---------|------|
-| [prompts/user_config.yaml](src/dynamic_prompt/prompts/user_config.yaml) | ユーザーの母語、復習までの待ち時間 (`memory_test_period_hours`) |
-| [prompts/app_config.yaml](src/dynamic_prompt/prompts/app_config.yaml) | 一度に取得する単語数、クイズサーバーのポート |
-| [prompts/instructions.yaml](src/dynamic_prompt/prompts/instructions.yaml) | AI に渡す指示テンプレート (`{variable}` プレースホルダ対応) |
-| [prompts/languages/](src/dynamic_prompt/prompts/languages/) | 言語ごとの教え方プロファイル。新しい言語は `<code>.yaml` を追加 |
+| ファイル                                                                  | 内容                                                            |
+| ------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| [prompts/user_config.yaml](src/dynamic_prompt/prompts/user_config.yaml)   | ユーザーの母語、復習までの待ち時間 (`memory_test_period_hours`) |
+| [prompts/app_config.yaml](src/dynamic_prompt/prompts/app_config.yaml)     | 一度に取得する単語数、クイズサーバーのポート                    |
+| [prompts/instructions.yaml](src/dynamic_prompt/prompts/instructions.yaml) | AI に渡す指示テンプレート (`{variable}` プレースホルダ対応)     |
+| [prompts/languages/](src/dynamic_prompt/prompts/languages/)               | 言語ごとの教え方プロファイル。新しい言語は `<code>.yaml` を追加 |
 
 YAML を編集したら整合性チェックを走らせる。
 
 ```bash
-uv run mcps/dynamic_prompt/src/dynamic_prompt/validate.py
+uv run --package dynamic_prompt python mcps/dynamic_prompt/src/dynamic_prompt/validate.py
 ```

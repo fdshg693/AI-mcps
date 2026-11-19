@@ -5,12 +5,12 @@
 # 動作確認に使う。
 #
 # 使い方:
-#   cd mcps/dynamic_prompt/infra
+#   cd dynamic_prompt/infra   (mcps サブモジュールのルートから)
 #   docker compose -f firestore-emulator.compose.yml up -d --wait
 #   # 別シェルで
 #   $env:FIRESTORE_EMULATOR_HOST="127.0.0.1:8085"
 #   $env:GOOGLE_CLOUD_PROJECT="dynamic-prompt-mcp-test"
-#   uv run --project mcps/dynamic_prompt pytest mcps/dynamic_prompt/src/dynamic_prompt/tests/test_repo_contract.py -v
+#   uv run --project .. pytest ../src/dynamic_prompt/tests/test_repo_contract.py -v
 #   docker compose -f firestore-emulator.compose.yml down
 #
 # `just emulator-up` / `just test-firestore` / `just emulator-down` でも操作可能。

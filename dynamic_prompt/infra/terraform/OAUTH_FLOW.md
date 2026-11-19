@@ -10,10 +10,10 @@ Claude.ai  ──(外側OAuth)──>  FastMCP (Cloud Run)  ──(内側OAuth)�
 
 OAuth が 2 層ある点がこのアーキテクチャの特徴。
 
-| 層 | 誰 → 誰 | Client ID | 目的 |
-|---|---------|-----------|------|
-| **外側** | Claude.ai → FastMCP | 手動 DCR で取得した UUID | MCP エンドポイントへのアクセス制御 |
-| **内側** | FastMCP → Google | GCP Console の OAuth Client ID | ユーザーの身元確認 (Google ログイン) |
+| 層       | 誰 → 誰             | Client ID                      | 目的                                 |
+| -------- | ------------------- | ------------------------------ | ------------------------------------ |
+| **外側** | Claude.ai → FastMCP | 手動 DCR で取得した UUID       | MCP エンドポイントへのアクセス制御   |
+| **内側** | FastMCP → Google    | GCP Console の OAuth Client ID | ユーザーの身元確認 (Google ログイン) |
 
 ---
 

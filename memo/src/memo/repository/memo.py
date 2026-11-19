@@ -93,8 +93,7 @@ def list_memos_db(
     where = " AND ".join(clauses)
     with _connect_db() as db:
         rows = db.execute(
-            f"SELECT * FROM memos WHERE {where} "
-            "ORDER BY updated_at DESC, id DESC LIMIT ? OFFSET ?",
+            f"SELECT * FROM memos WHERE {where} ORDER BY updated_at DESC, id DESC LIMIT ? OFFSET ?",
             [*params, limit, offset],
         ).fetchall()
     return [_row_to_dict(r) for r in rows]
@@ -108,9 +107,7 @@ def count_memos_db(user_id: int, category: str | None = None) -> int:
     clauses, params = _base_filter(user_id, category)
     where = " AND ".join(clauses)
     with _connect_db() as db:
-        row = db.execute(
-            f"SELECT COUNT(*) AS n FROM memos WHERE {where}", params
-        ).fetchone()
+        row = db.execute(f"SELECT COUNT(*) AS n FROM memos WHERE {where}", params).fetchone()
     return row["n"]
 
 
@@ -143,8 +140,7 @@ def search_memos_db(
     params.append(limit)
     with _connect_db() as db:
         rows = db.execute(
-            f"SELECT * FROM memos WHERE {where} "
-            "ORDER BY updated_at DESC, id DESC LIMIT ?",
+            f"SELECT * FROM memos WHERE {where} ORDER BY updated_at DESC, id DESC LIMIT ?",
             params,
         ).fetchall()
 
@@ -196,9 +192,7 @@ def update_memo_db(
                 f"UPDATE memos SET {', '.join(fields)} WHERE {where}",
                 params + scope_params,
             )
-            row = db.execute(
-                f"SELECT * FROM memos WHERE {where}", scope_params
-            ).fetchone()
+            row = db.execute(f"SELECT * FROM memos WHERE {where}", scope_params).fetchone()
     return _row_to_dict(row)
 
 

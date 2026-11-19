@@ -11,7 +11,7 @@ Categories are scoped to the owning user in every operation. `admin` is **not** 
 
 ## Memo ⇄ category invariant (validation)
 
-A memo can only be linked to a category its owner has registered. Note this is *not* a DB foreign key: `memos.category` is a denormalized string kept in sync by triggers (the "reassign to the owner's `OTHERS`" delete behavior is per-row dynamic and can't be an FK action — see [SCHEMA.md](../SCHEMA.md)). The "must be registered" rule is therefore an application invariant enforced in **`service.memo`** (the repository stays permissive):
+A memo can only be linked to a category its owner has registered. Note this is _not_ a DB foreign key: `memos.category` is a denormalized string kept in sync by triggers (the "reassign to the owner's `OTHERS`" delete behavior is per-row dynamic and can't be an FK action — see [SCHEMA.md](../SCHEMA.md)). The "must be registered" rule is therefore an application invariant enforced in **`service.memo`** (the repository stays permissive):
 
 - `create_memo` / `update_memo` call `_require_known_category(user_id, category)`: the normalized category must be `OTHERS` or exist via `repository.category.category_exists_db(user_id, name)`, else `UnknownCategory` is raised. Each edge translates it (MCP → `Error: category 'X' is not registered. Create it first.`, web → HTTP 400).
 - On `update_memo`, `category=None` means unchanged (no check); `category=""` resets to `OTHERS` (always allowed).

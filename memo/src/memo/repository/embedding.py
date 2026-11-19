@@ -30,9 +30,7 @@ def get_cached_embedding(memo_id: int) -> dict | None:
     }
 
 
-def upsert_embedding(
-    memo_id: int, summary_hash: str, model: str, vector: list[float]
-) -> None:
+def upsert_embedding(memo_id: int, summary_hash: str, model: str, vector: list[float]) -> None:
     """埋め込みを保存する。同じ memo_id があれば上書きする (1メモ1行)。"""
     with _connect_db() as db:
         db.execute(

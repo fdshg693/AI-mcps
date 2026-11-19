@@ -1,7 +1,8 @@
 # ============================================================
 # dynamic_prompt infra — Docker / Cloud Build / Terraform
 # ============================================================
-# Usage:  cd mcps/dynamic_prompt/infra && just <recipe>
+# Usage:  cd dynamic_prompt/infra && just <recipe>   (from the mcps submodule root)
+# GCP project: GCP_PROJECT_ID env var, else project_id in terraform/terraform.tfvars
 # ============================================================
 
 # 文字化け等の対策で Git Bash を利用する
@@ -9,13 +10,15 @@ set windows-shell := ["C:/Program Files/Git/usr/bin/bash.exe", "-cu"]
 set shell         := ["bash", "-cu"]
 
 # ---------- 変数 ----------
-project_id := "dynamic-prompt-mcp"
+# terraform.tfvars が無い・project_id が無いときは空になり、GCP を使うレシピは _require-project で止まる
+project_id := env("GCP_PROJECT_ID", `sed -nE 's/^[[:space:]]*project_id[[:space:]]*=[[:space:]]*"([^"]*)".*/\1/p' terraform/terraform.tfvars 2>/dev/null || true`)
 region     := "asia-northeast1"
 image_repo := region + "-docker.pkg.dev/" + project_id + "/dynamic-prompt/server"
 image_tag  := "latest"
 image      := image_repo + ":" + image_tag
 container  := "dp-test"
-repo_root  := `git rev-parse --show-toplevel` + "/src/my_ai_tools"
+# Docker / Cloud Build のコンテキスト = mcps サブモジュールのルート (アンブレラのルートではない)
+repo_root  := `git rev-parse --show-toplevel`
 # Windows の justfile_directory() はバックスラッシュ区切りで返るため、bash が解釈する際にエスケープとして消える。
 # forward slash に変換してから他のパスを組み立てる。
 infra_dir  := replace(justfile_directory(), "\\", "/")
@@ -24,6 +27,10 @@ tf_dir     := infra_dir + "/terraform"
 # レシピ一覧を表示
 default:
     @just --list
+
+[private]
+_require-project:
+    @test -n "{{ project_id }}" || { echo "GCP project ID is not set: export GCP_PROJECT_ID or set project_id in terraform/terraform.tfvars" >&2; exit 1; }
 
 # ---------- Docker (ローカル) ----------
 
@@ -78,8 +85,9 @@ migrate-firestore: emulator-up
 # ---------- Cloud Build ----------
 
 # Cloud Build でイメージビルド & プッシュ
-cloud-build:
+cloud-build: _require-project
     gcloud builds submit \
+        --project={{ project_id }} \
         --config {{ infra_dir }}/cloudbuild.yaml \
         --substitutions=_IMAGE={{ image }} \
         {{ repo_root }}
@@ -117,7 +125,7 @@ cloud-quiz:
     URL=$(terraform -chdir={{ tf_dir }} output -raw service_url) && cmd //c start "" "$URL/"
 
 # Cloud Run サービスの詳細情報 (gcloud から取得: リビジョン, イメージ, ステータス等)
-cloud-info:
+cloud-info: _require-project
     gcloud run services describe dynamic-prompt \
         --project={{ project_id }} \
         --region={{ region }} \
@@ -134,13 +142,13 @@ cloud-info:
 # YAML 設定 (prompts ディレクトリ) を GCS バケットの prompts/ prefix に同期
 # サーバはこれを `PROMPTS_URI=gs://<bucket>/prompts` から読み込み TTL キャッシュする。
 # 変更を即時反映するには `reload_config` MCP ツールを呼ぶ。
-upload-prompts:
+upload-prompts: _require-project
     gsutil -m rsync -r -d \
         {{ infra_dir }}/../src/dynamic_prompt/prompts \
         gs://{{ project_id }}-dp-data/prompts
 
 # GCS 上の prompts/ をローカルに取得（バックアップ・確認用）
-download-prompts:
+download-prompts: _require-project
     gsutil -m rsync -r \
         gs://{{ project_id }}-dp-data/prompts \
         {{ infra_dir }}/../src/dynamic_prompt/prompts

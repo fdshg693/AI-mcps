@@ -3,7 +3,7 @@ steps:
     args:
       - 'build'
       - '-f'
-      - 'mcps/dynamic_prompt/infra/Dockerfile'
+      - 'dynamic_prompt/infra/Dockerfile'
       - '-t'
       - '${_IMAGE}'
       - '.'

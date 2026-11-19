@@ -3,6 +3,7 @@
 ## 目的
 
 `mcps/dynamic_prompt/admin-web/` にNext.js 15プロジェクトを作成し、Google認証付きで以下が動くようにする:
+
 - `/dashboard`: Firestore統計表示
 - `/configs`: GCS上のYAML一覧 + Monacoエディタで編集 + 保存
 - `/vocabulary`: Firestoreの語彙CRUD
@@ -40,6 +41,7 @@ npx create-next-app@latest admin-web --typescript --tailwind --app --no-src-dir
 `admin-web/` に作成された雛形を整理し、`src/` 以下にAppRouter構成で配置。
 
 依存追加:
+
 ```powershell
 cd admin-web
 npm install next-auth@beta @monaco-editor/react js-yaml zod firebase-admin @google-cloud/storage
@@ -49,6 +51,7 @@ npm install -D @types/js-yaml
 ### 6.2 環境変数定義
 
 `admin-web/.env.example`:
+
 ```
 NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=
@@ -65,6 +68,7 @@ PROMPTS_GCS_PREFIX=prompts
 ```
 
 `admin-web/src/env.ts` でzodで検証:
+
 ```ts
 import { z } from "zod";
 
@@ -86,16 +90,19 @@ export const env = schema.parse(process.env);
 ### 6.3 許可リストヘルパ
 
 `admin-web/src/lib/allowlist.ts`:
+
 ```ts
 import { env } from "@/env";
 
 const allowed = new Set(
-  env.ALLOWED_EMAILS.split(",").map(e => e.trim().toLowerCase()).filter(Boolean),
+  env.ALLOWED_EMAILS.split(",")
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean),
 );
 
 export function isAllowed(email: string | null | undefined): boolean {
   if (!email) return false;
-  if (allowed.size === 0) return false;  // MCPと違い、空なら全拒否
+  if (allowed.size === 0) return false; // MCPと違い、空なら全拒否
   return allowed.has(email.toLowerCase());
 }
 ```
@@ -103,6 +110,7 @@ export function isAllowed(email: string | null | undefined): boolean {
 ### 6.4 Auth.js v5 設定
 
 `admin-web/src/auth.ts`:
+
 ```ts
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
@@ -142,12 +150,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 ```
 
 `admin-web/src/app/api/auth/[...nextauth]/route.ts`:
+
 ```ts
 import { handlers } from "@/auth";
 export const { GET, POST } = handlers;
 ```
 
 `admin-web/src/middleware.ts`:
+
 ```ts
 export { auth as middleware } from "@/auth";
 export const config = {
@@ -158,8 +168,14 @@ export const config = {
 ### 6.5 Firestoreクライアント
 
 `admin-web/src/lib/firestore.ts`:
+
 ```ts
-import { initializeApp, getApps, cert, applicationDefault } from "firebase-admin/app";
+import {
+  initializeApp,
+  getApps,
+  cert,
+  applicationDefault,
+} from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 import { env } from "@/env";
 
@@ -178,6 +194,7 @@ export const db = getFirestore();
 ### 6.6 GCSクライアント
 
 `admin-web/src/lib/gcs.ts`:
+
 ```ts
 import { Storage } from "@google-cloud/storage";
 import { env } from "@/env";
@@ -193,6 +210,7 @@ export function configPath(rel: string): string {
 ### 6.7 MCPクライアント
 
 `admin-web/src/lib/mcp-client.ts`:
+
 ```ts
 import { env } from "@/env";
 
@@ -213,29 +231,35 @@ export async function notifyReloadConfig(userEmail: string): Promise<void> {
 ### 6.8 ページ実装
 
 #### `/login` — `app/login/page.tsx`
+
 - ログインフォーム（クライアントコンポーネント）
 - `signIn("google")` 呼び出しボタン
 - URLクエリ `?error=AccessDenied` のときトースト表示
 
 #### `/(app)/layout.tsx`
+
 - サーバコンポーネント
 - `auth()` でsession取得 → なければ `redirect("/login")`
 - サイドバー（dashboard/configs/vocabulary）+ サインアウトボタン
 
 #### `/(app)/dashboard/page.tsx`
+
 - サーバコンポーネント
 - `db.collection("unknown_words").count().get()` 等で各statusの件数取得
 - カードUI表示
 
 #### `/(app)/configs/page.tsx`
+
 - `bucket.getFiles({ prefix: env.PROMPTS_GCS_PREFIX })` でYAML一覧取得
 - 各ファイルへのリンク（`/configs/[...path]`）
 
 #### `/(app)/configs/[...path]/page.tsx`
+
 - サーバコンポーネントでGCSから内容取得 → `<YamlEditor initialContent={...} path={...}>` (クライアントコンポーネント)
 - `YamlEditor.tsx`: `@monaco-editor/react` でYAMLモード、保存ボタンで `fetch("/api/configs/<path>", {method: "PUT", body: ...})`
 
 #### `/api/configs/[...path]/route.ts` (PUT)
+
 ```ts
 import { NextRequest } from "next/server";
 import yaml from "js-yaml";
@@ -243,38 +267,55 @@ import { auth } from "@/auth";
 import { bucket, configPath } from "@/lib/gcs";
 import { notifyReloadConfig } from "@/lib/mcp-client";
 
-const ALLOWED_PREFIXES = ["user_config.yaml", "app_config.yaml", "instructions.yaml", "languages/"];
+const ALLOWED_PREFIXES = [
+  "user_config.yaml",
+  "app_config.yaml",
+  "instructions.yaml",
+  "languages/",
+];
 
-export async function PUT(req: NextRequest, { params }: { params: { path: string[] } }) {
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: { path: string[] } },
+) {
   const session = await auth();
-  if (!session?.user?.email) return Response.json({ error: "unauthorized" }, { status: 401 });
+  if (!session?.user?.email)
+    return Response.json({ error: "unauthorized" }, { status: 401 });
 
   const rel = params.path.join("/");
-  if (!ALLOWED_PREFIXES.some(p => rel === p || rel.startsWith(p))) {
+  if (!ALLOWED_PREFIXES.some((p) => rel === p || rel.startsWith(p))) {
     return Response.json({ error: "forbidden path" }, { status: 400 });
   }
-  if (rel.includes("..")) return Response.json({ error: "invalid path" }, { status: 400 });
+  if (rel.includes(".."))
+    return Response.json({ error: "invalid path" }, { status: 400 });
 
   const { content } = await req.json();
   try {
     yaml.load(content);
   } catch (e: any) {
-    return Response.json({ error: "yaml parse error", detail: e.message }, { status: 400 });
+    return Response.json(
+      { error: "yaml parse error", detail: e.message },
+      { status: 400 },
+    );
   }
 
-  await bucket.file(configPath(rel)).save(content, { contentType: "application/yaml" });
+  await bucket
+    .file(configPath(rel))
+    .save(content, { contentType: "application/yaml" });
   await notifyReloadConfig(session.user.email);
   return Response.json({ status: "saved" });
 }
 ```
 
 #### `/(app)/vocabulary/page.tsx`
+
 - フィルタフォーム（lang/status/q）
 - サーバコンポーネントで `db.collection("unknown_words").where(...).limit(50).get()`
 - 各行に `<VocabTable />` (クライアント) でインライン編集ボタン
 - 編集確定/削除は `/api/vocab/[id]/route.ts` 経由
 
 #### `/api/vocab/[id]/route.ts` (PATCH, DELETE)
+
 - `auth()` チェック
 - `id` は `${lang}__${word}` 形式の自然キー
 - PATCH: 許可フィールドのみ更新（`status`, `context`）
@@ -309,6 +350,7 @@ npm run dev
 ```
 
 確認手順:
+
 1. `http://localhost:3000/login` → Googleサインイン
 2. 許可外メールでサインイン → AccessDenied 表示
 3. 許可済みメール → `/dashboard` 遷移、カードに件数表示
@@ -320,6 +362,7 @@ npm run dev
 ### 6.11 GCP OAuth設定（開発用）
 
 新規OAuthクライアントID（管理ページ用）をGCPコンソールで発行:
+
 1. APIs & Services > Credentials > "Create credentials" > "OAuth client ID"
 2. Type: Web application
 3. Authorized redirect URIs:

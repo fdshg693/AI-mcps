@@ -1,0 +1,10 @@
+# Files `gcloud builds submit` (dynamic_prompt/infra/justfile: cloud-build) does not upload.
+# Without this file gcloud falls back to .gitignore, which misses the Junctions below
+# (they are hidden through .git/info/exclude, which gcloud does not read).
+.gcloudignore
+.git
+#!include:.gitignore
+# Junctions created by `just links-sync` (point outside this repository)
+plans
+_umbrella
+.claude

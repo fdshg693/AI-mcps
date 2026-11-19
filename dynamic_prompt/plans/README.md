@@ -8,15 +8,15 @@ dynamic_prompt MCPサーバに、Google認証で保護された管理者用WEB�
 
 ## フェーズ一覧
 
-| Phase | 内容 | 不可逆性 | 依存 |
-|---|---|---|---|
-| [Phase 1](./phase1-repository-layer.md) | リポジトリ層導入（既存挙動を変えない） | 低 | なし |
-| [Phase 2](./phase2-firestore-impl.md) | Firestore実装 + 移行スクリプト + エミュレータテスト | 低 | Phase 1 |
-| [Phase 3](./phase3-admin-rest-api.md) | 管理REST API (reload-config + health) + config_source.write_text | 低 | なし（Phase 1と並行可） |
-| [Phase 4](./phase4-infra-firestore.md) | Terraform: Firestore + インデックス + IAM + MCP_ADMIN_TOKEN | 中 | Phase 2, 3 |
-| [Phase 5](./phase5-prod-migration.md) | 本番データ移行 + MCPサービス切替 | **高** | Phase 4 |
-| [Phase 6](./phase6-nextjs-implementation.md) | Next.js管理Web実装（ローカル動作確認まで） | 低 | Phase 2, 3 |
-| [Phase 7](./phase7-admin-deploy.md) | 管理WebのTerraform + Cloud Buildデプロイ | 中 | Phase 5, 6 |
+| Phase                                        | 内容                                                             | 不可逆性 | 依存                    |
+| -------------------------------------------- | ---------------------------------------------------------------- | -------- | ----------------------- |
+| [Phase 1](./phase1-repository-layer.md)      | リポジトリ層導入（既存挙動を変えない）                           | 低       | なし                    |
+| [Phase 2](./phase2-firestore-impl.md)        | Firestore実装 + 移行スクリプト + エミュレータテスト              | 低       | Phase 1                 |
+| [Phase 3](./phase3-admin-rest-api.md)        | 管理REST API (reload-config + health) + config_source.write_text | 低       | なし（Phase 1と並行可） |
+| [Phase 4](./phase4-infra-firestore.md)       | Terraform: Firestore + インデックス + IAM + MCP_ADMIN_TOKEN      | 中       | Phase 2, 3              |
+| [Phase 5](./phase5-prod-migration.md)        | 本番データ移行 + MCPサービス切替                                 | **高**   | Phase 4                 |
+| [Phase 6](./phase6-nextjs-implementation.md) | Next.js管理Web実装（ローカル動作確認まで）                       | 低       | Phase 2, 3              |
+| [Phase 7](./phase7-admin-deploy.md)          | 管理WebのTerraform + Cloud Buildデプロイ                         | 中       | Phase 5, 6              |
 
 ## 推奨実行順
 

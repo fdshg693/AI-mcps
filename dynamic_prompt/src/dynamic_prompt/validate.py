@@ -3,7 +3,7 @@ instructions.yaml の variables 宣言と、user_config.yaml / languages/*.yaml 
 キーの整合性をチェックするバリデーションスクリプト。
 
 Usage:
-    uv run mcps/dynamic_prompt/src/dynamic_prompt/validate.py
+    uv run --package dynamic_prompt python mcps/dynamic_prompt/src/dynamic_prompt/validate.py
 """
 
 import re
@@ -80,9 +80,7 @@ def validate() -> list[str]:
         # 4. 宣言されているのにテンプレートで使われていない変数
         unused = declared_all - used
         if unused:
-            errors.append(
-                f"[{name}] variables に宣言されているがテンプレートで未使用: {unused}"
-            )
+            errors.append(f"[{name}] variables に宣言されているがテンプレートで未使用: {unused}")
 
     return errors
 

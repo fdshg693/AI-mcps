@@ -20,15 +20,11 @@ class VocabRepo(Protocol):
         """単語を保存し、保存された (正規化済み) 単語のリストを返す。"""
         ...
 
-    def get_review_pool(
-        self, lang: str, limit: int, memory_test_period_hours: int
-    ) -> list[dict]:
+    def get_review_pool(self, lang: str, limit: int, memory_test_period_hours: int) -> list[dict]:
         """復習対象の単語 (``word`` / ``context`` / ``status``) をランダムに返す。"""
         ...
 
-    def process_answers(
-        self, lang: str, correct: list[str], incorrect: list[str]
-    ) -> list[str]:
+    def process_answers(self, lang: str, correct: list[str], incorrect: list[str]) -> list[str]:
         """正答・誤答にステータス遷移を適用し、結果メッセージのリストを返す。"""
         ...
 

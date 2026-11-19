@@ -26,6 +26,7 @@
 Cloud Run のボリュームマウント先 `/data/vocab.db` をローカルマシンに取得:
 
 選択肢 A: GCS経由でコピー（推奨）
+
 ```powershell
 # MCPサービスは稼働を継続したまま、GCSバケットを直接見る
 gsutil cp gs://dynamic-prompt-mcp-dp-data/vocab.db .\vocab.db.backup-$(Get-Date -Format yyyyMMdd-HHmmss)
@@ -52,6 +53,7 @@ uv run python -m dynamic_prompt.migrate_to_firestore `
 ```
 
 期待される出力:
+
 ```
 [dry-run] Would write unknown_words: 234 docs
 [dry-run] Would write quiz_sessions: 56 docs + 412 question subdocs
@@ -69,6 +71,7 @@ uv run python -m dynamic_prompt.migrate_to_firestore `
 ```
 
 実行後、スクリプトが自動で件数突き合わせを行う:
+
 ```
 ✓ unknown_words: SQLite=234, Firestore=234
 ✓ quiz_sessions: SQLite=56, Firestore=56
@@ -79,6 +82,7 @@ Migration complete.
 不一致があれば exit code 1 で停止する。
 
 **スポットチェック**:
+
 ```powershell
 # 1件取得して目視確認
 gcloud firestore documents list --collection-ids=unknown_words --limit=3 --project=dynamic-prompt-mcp
@@ -87,6 +91,7 @@ gcloud firestore documents list --collection-ids=unknown_words --limit=3 --proje
 ### 5.4 サービス切替
 
 `infra/terraform/cloud_run.tf` に env 追加:
+
 ```hcl
 env {
   name  = "DATA_BACKEND"
@@ -123,6 +128,7 @@ curl -i "$URL/health"
 ```
 
 ログ確認:
+
 ```powershell
 gcloud run services logs read dynamic-prompt --limit=50 --project=dynamic-prompt-mcp
 ```
@@ -150,10 +156,12 @@ gsutil mv "gs://dynamic-prompt-mcp-dp-data/vocab.db-wal" "gs://dynamic-prompt-mc
 ## ロールバック
 
 ### 移行中のロールバック
+
 - 5.2 のdry-runで件数が合わない → スクリプトを修正してリトライ
 - 5.3 の書き込みで一部失敗 → Firestoreの該当コレクションをコンソールで一括削除し、5.3 を再実行（自然IDは upsert なので重複しない）
 
 ### 切替後のロールバック
+
 - 5.4 の `terraform apply` を巻き戻し（`DATA_BACKEND` env を削除して再apply）→ SQLiteに戻る
 - ただし切替後に書かれたFirestoreの新規データはSQLiteに反映されないため、切替後すぐの問題は早めに検知すること
 - バックアップから vocab.db を復元する場合:

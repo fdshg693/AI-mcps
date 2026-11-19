@@ -28,6 +28,7 @@ GCPプロジェクト `dynamic-prompt-mcp` にFirestore Native modeを `asia-nor
 選択肢 A（推奨・Terraform管理）:
 
 `infra/terraform/firestore.tf` 新規:
+
 ```hcl
 resource "google_firestore_database" "default" {
   project     = var.project_id
@@ -41,14 +42,17 @@ resource "google_firestore_database" "default" {
 ```
 
 選択肢 B（手動）:
+
 ```powershell
 gcloud firestore databases create --location=asia-northeast1 --project=dynamic-prompt-mcp
 ```
+
 ※ Firestoreは**プロジェクト全体で1度しか作成できない**ため、既に作成済みなら `terraform import google_firestore_database.default projects/dynamic-prompt-mcp/databases/(default)` する。
 
 ### 4.2 複合インデックス
 
 `infra/terraform/firestore_indexes.tf` 新規:
+
 ```hcl
 resource "google_firestore_index" "unknown_words_review" {
   project    = var.project_id
@@ -124,6 +128,7 @@ resource "google_firestore_index" "story_topics_recent" {
 ### 4.3 variables.tf 拡張
 
 `infra/terraform/variables.tf` に追加:
+
 ```hcl
 variable "mcp_admin_token" {
   description = "Bearer token for /admin/api/* endpoints"
@@ -133,6 +138,7 @@ variable "mcp_admin_token" {
 ```
 
 `infra/terraform/terraform.tfvars.example` に例を追記:
+
 ```
 mcp_admin_token = "generate-strong-random-32-chars"
 ```
@@ -140,6 +146,7 @@ mcp_admin_token = "generate-strong-random-32-chars"
 ### 4.4 cloud_run.tf 修正（既存MCP）
 
 [infra/terraform/cloud_run.tf](../infra/terraform/cloud_run.tf) の env ブロックに追加:
+
 ```hcl
 env {
   name  = "MCP_ADMIN_TOKEN"
@@ -157,6 +164,7 @@ env {
 ### 4.5 IAM拡張
 
 `infra/terraform/iam.tf` に追記:
+
 ```hcl
 resource "google_project_iam_member" "mcp_firestore_user" {
   project = var.project_id
@@ -188,6 +196,7 @@ just tf-apply
 - 既存MCPサービスがまだSQLiteで動いていることを確認（`/health` 200、MCPツール正常動作）
 
 スモークテスト:
+
 ```powershell
 $URL = just cloud-url
 curl -i "$URL/health"

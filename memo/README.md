@@ -1,4 +1,4 @@
-> **このファイルについて**: README は人間が読むためのドキュメントです。起動手順・アプリの概要と意味・他ファイルへの参照・注意点を、網羅は目指さずまとまりよく **日本語** で書きます。実装・調査の詳細は AI 向けの [CLAUDE.md](./CLAUDE.md)（英語）にあります。この役割分担は今後も維持してください。
+> **このファイルについて**: README は人間が読むためのドキュメントです。起動手順・アプリの概要と意味・他ファイルへの参照・注意点を、網羅は目指さずまとまりよく **日本語** で書きます。実装・調査の詳細は AI 向けの [claude/](./claude/) と [.claude/rules/memo-*.md](../.claude/rules/memo-server.md)（英語）にあります。この役割分担は今後も維持してください。
 
 # memo
 
@@ -16,19 +16,21 @@
 - **接続を張り替えずにユーザー切り替え**: `switch_user` ツールで、再接続やサーバー再起動なしに現在のユーザーを切り替えられる（個人ローカル運用向け）。
 - **監査ログ**: ツール呼び出しを 1 箇所で記録する。`--debug` で `Mcp-Session-Id` を含むセッション全体像を出力できる。
 
-提供するツールの一覧・使い方は [TOOLS.md](./TOOLS.md)、システムプロンプトへの組み込み例は [USECASE.md](./USECASE.md)、データモデルや実装の詳細は [CLAUDE.md](./CLAUDE.md) を参照。
+提供するツールの一覧・使い方は [TOOLS.md](./TOOLS.md)、システムプロンプトへの組み込み例は [USECASE.md](./USECASE.md)、データモデルや実装の詳細は [claude/](./claude/) を参照。
 
 ## 実行
 
+コマンドはアンブレラ（fdshg693/AI）のルートで実行する（パッケージはアンブレラの uv workspace のメンバー）。
+
 ```bash
 # stdio トランスポート（Claude Desktop / VS Code はこの方式で接続する）
-uv run memo --user alice
+uv run --package memo memo --user alice
 
 # HTTP トランスポート。接続側は /mcp?user=NAME&client_id=ID を指定する
-TRANSPORT=http PORT=8080 uv run memo
+TRANSPORT=http PORT=8080 uv run --package memo memo
 
 # セッション全体像（Mcp-Session-Id など）を DEBUG ログで見たいとき
-uv run memo --user alice --debug          # 環境変数 MEMO_LOG_DEBUG=1 でも可
+uv run --package memo memo --user alice --debug          # 環境変数 MEMO_LOG_DEBUG=1 でも可
 ```
 
 DB ファイルの場所は環境変数 `MEMO_DB_PATH` で上書きできる（デフォルト: `src/memo/memo.db`）。HTTP のバインドアドレスは `HOST`（デフォルト `127.0.0.1` = ローカル束縛）、ポートは `PORT`（デフォルト `8080`）。
@@ -40,18 +42,18 @@ DB ファイルの場所は環境変数 `MEMO_DB_PATH` で上書きできる（�
 既存 DB を手動で最新スキーマへ移行・確認したいときは次を使う（冪等。移行前後の `schema_version` を表示する）。
 
 ```bash
-uv run memo-migrate                 # MEMO_DB_PATH / 既定の memo.db を対象に移行
-uv run memo-migrate /path/to/memo.db
+uv run --package memo memo-migrate                 # MEMO_DB_PATH / 既定の memo.db を対象に移行
+uv run --package memo memo-migrate /path/to/memo.db
 ```
 
 ## ユーザーの識別と登録
 
 すべてのメモは「接続ユーザー」が所有する。ユーザーはトランスポートごとに異なる方法で渡す。
 
-| トランスポート | 指定方法 | 例 |
-|---------------|---------|----|
-| stdio | 起動引数 `--user`（または環境変数 `MEMO_USER`）。プロセス全体でユーザーは 1 人に固定される | `uv run memo --user alice` |
-| HTTP | MCP エンドポイントのクエリパラメータ `?user=`。任意で `?client_id=` を併用 | `http://host:8080/mcp?user=alice&client_id=desktop-1` |
+| トランスポート | 指定方法                                                                                   | 例                                                    |
+| -------------- | ------------------------------------------------------------------------------------------ | ----------------------------------------------------- |
+| stdio          | 起動引数 `--user`（または環境変数 `MEMO_USER`）。プロセス全体でユーザーは 1 人に固定される | `uv run --package memo memo --user alice`             |
+| HTTP           | MCP エンドポイントのクエリパラメータ `?user=`。任意で `?client_id=` を併用                 | `http://host:8080/mcp?user=alice&client_id=desktop-1` |
 
 接続が許可されるのは `users` 台帳に登録済みのユーザーのみ。ユーザーを識別できない（`--user` / `?user=` の指定が無い）、または識別できても未登録の接続は、すべてのツール呼び出しがエラーで拒否される。新しいユーザーは `admin` で接続して `create_user` ツールで登録する。あるいは、後述の管理 UI（`memo-admin`）からブラウザで登録・編集・削除できる。
 
@@ -61,7 +63,7 @@ DB を直接いじったり Claude 経由で `create_user` を呼んだりせず
 
 ```bash
 # 管理画面を起動して http://127.0.0.1:8090 を開く
-uv run memo-admin
+uv run --package memo memo-admin
 ```
 
 画面ではユーザーの一覧表示・追加・表示名/備考の編集・削除に加え、**管理者権限（`is_admin`）の付与・剥奪**ができる（`is_admin` を編集できるのはこの Web UI だけ）。一覧には「管理者」列のチェックボックスがあり、保存すると反映される。ユーザー追加フォームにも「管理者」チェックボックスがある。ユーザー名 `name` は不変なので編集対象は `display_name` / `note` / `is_admin`。**最後の 1 人の管理者は削除も降格もできない**（API 側でも拒否される）。バインド先は環境変数 `MEMO_ADMIN_HOST`（既定 `127.0.0.1`）、ポートは `MEMO_ADMIN_PORT`（既定 `8090`）で変更できる。DB ファイルは MCP サーバーと同じく `MEMO_DB_PATH` に従う。
@@ -136,8 +138,8 @@ OPENAI_API_KEY=sk-...
 
 ```bash
 # 単体テスト（DB の CRUD・検索・ユーザー台帳・カテゴリ・ユーザー分離・マイグレーション）
-uv run --project mcps/memo pytest mcps/memo/src/memo/tests/ -v
+uv run --package memo pytest mcps/memo/src/memo/tests/ -v
 
 # MCP クライアントでツール一覧を確認（インプロセス接続）
-uv run python -m memo.tests.test_mcp_client
+uv run --package memo python -m memo.tests.test_mcp_client
 ```

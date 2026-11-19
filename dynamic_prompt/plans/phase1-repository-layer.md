@@ -54,6 +54,7 @@ class RepoBundle:
 新規ファイル: `src/dynamic_prompt/repo/sqlite_repo.py`
 
 既存 `database.py` の以下を移植:
+
 - `_connect_db`, `_migrate`, `_MIGRATIONS`, `init_db`
 - `save_words_db`, `get_words_db`, `update_word_status`, `delete_word`
 - `create_quiz_session`, `add_quiz_questions`, `get_pending_quizzes`, `submit_quiz_answers`, `get_quiz_results`, `get_unscored_free_quizzes`, `score_free_answers_db`

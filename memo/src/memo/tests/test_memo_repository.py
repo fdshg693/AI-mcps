@@ -126,9 +126,7 @@ def test_search_matched_keywords_per_memo():
     create_memo_db(A, "買い物メモ", "")  # メモ のみ
     create_memo_db(A, "やることリスト", "")  # リスト のみ
 
-    by_title = {
-        m["title"]: m["matched_keywords"] for m in search_memos_db(A, ["メモ", "リスト"])
-    }
+    by_title = {m["title"]: m["matched_keywords"] for m in search_memos_db(A, ["メモ", "リスト"])}
     assert by_title["会議メモのリスト"] == ["メモ", "リスト"]
     assert by_title["買い物メモ"] == ["メモ"]
     assert by_title["やることリスト"] == ["リスト"]
